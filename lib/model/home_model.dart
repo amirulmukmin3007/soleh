@@ -8,13 +8,16 @@ class HomeModel {
   Formatter formatter = Formatter();
   String currentHijrahDate = '';
   String currentLocation = '';
+  String setDate = '';
   String currentDate = '';
+  String currentHoliday = '';
   String currentTime = '';
   String currentMeridiem = '';
   double currentLat = 0.0;
   double currentLng = 0.0;
 
   // Waktu Solat
+  String currentDay = '';
   String subuhTime = '';
   String zohorTime = '';
   String asarTime = '';
@@ -24,11 +27,17 @@ class HomeModel {
   // Get Hijrah Date
   Future<String> getHijrahDate() async {
     try {
-      String currentDate = formatter.getCurrentDateFormattedAPI();
+      String setDate = formatter.getCurrentDateFormattedAPI();
       final response = await http.get(
-        Uri.parse('$aladhan$currentDate'),
+        Uri.parse('$aladhan$setDate'),
       );
       var data = jsonDecode(response.body);
+      print(data);
+      var dayAR = data['data']['hijri']['weekday']['ar'];
+      var dayEN = data['data']['hijri']['weekday']['en'];
+      currentHoliday = data['data']['hijri']['holidays'][0];
+      currentDate = formatter.getCurrentDateFormattedAPI();
+      currentDay = "$dayAR, $dayEN";
       currentHijrahDate =
           "${data['data']['hijri']['day']} ${data['data']['hijri']['month']['en']} ${data['data']['hijri']['year']}";
       return data;
@@ -66,12 +75,9 @@ class HomeModel {
   Future<Map<String, dynamic>> getWaktuSolatToday(
       double lat, double lng) async {
     DateTime now = DateTime.now();
-    print("latlng 1 : " + lat.toString() + ", " + lng.toString());
-    var lat2 = lat.toString();
-    var lng2 = lng.toString();
-    print("latlng 2 : $lat2, $lng2");
+    print("latlng 2 : $lat, $lng");
     String date = now.toString().split(' ')[0];
-    final String url = '$mpt$lat2,$lng2';
+    final String url = '$mpt$lat,$lng';
     final response = await http.get(Uri.parse(url));
     final json = jsonDecode(response.body);
     final jakimCode = json['data']['attributes']['jakim_code'];
