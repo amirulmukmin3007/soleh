@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "C:\\Users\\SDO-MUKMIN\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\rive_common-0.2.8\\android\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\SDO-MUKMIN\\AppData\\Local\\Android\\sdk\\cmake\\3.18.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\SDO-MUKMIN\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\rive_common-0.2.8\\android\\.cxx\\Debug\\3y2i192y\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\SDO-MUKMIN\\AppData\\Local\\Android\\sdk\\cmake\\3.18.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\SDO-MUKMIN\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\rive_common-0.2.8\\android\\.cxx\\Debug\\3y2i192y\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "rive_text::@6890427a1f51a3e7e1df": {
+      "artifactName": "rive_text",
+      "abi": "x86",
+      "output": "C:\\Users\\SDO-MUKMIN\\Documents\\GitHub\\soleh\\build\\rive_common\\intermediates\\cxx\\Debug\\3y2i192y\\obj\\x86\\librive_text.so",
+      "runtimeFiles": []
+    }
+  }
+}
