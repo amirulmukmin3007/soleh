@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:soleh/model/home_model.dart';
-import 'package:soleh/shared/component/circlebutton.dart';
 import 'package:soleh/shared/component/home_header.dart';
 import 'package:soleh/shared/component/waktusolat.dart';
 import 'package:soleh/shared/functions/formatter.dart';
@@ -37,8 +35,6 @@ class _HomeState extends State<Home> {
       },
     );
     homeModel.currentLocation = getLiveLocation();
-    // homeModel.getWaktuSolatToday(homeModel.currentLat, homeModel.currentLng);
-
     super.initState();
   }
 
@@ -47,14 +43,9 @@ class _HomeState extends State<Home> {
     location.getLocation().then((location) {
       homeModel.currentLat = location.latitude!;
       homeModel.currentLng = location.longitude!;
-      print(homeModel.currentLat.toString() +
-          ", " +
-          homeModel.currentLng.toString());
       var locationName =
           homeModel.getLocationName(homeModel.currentLat, homeModel.currentLng);
       homeModel.getWaktuSolatToday(homeModel.currentLat, homeModel.currentLng);
-      print(locationName);
-
       return locationName;
     });
     return '';

@@ -84,7 +84,6 @@ class HomeModel {
     });
 
     final jakimJson = jsonDecode(jakimResponse.body);
-    print(jakimJson['prayerTime'][0]['fajr']);
 
     subuhTime = jakimJson['prayerTime'][0]['fajr'];
     zohorTime = jakimJson['prayerTime'][0]['dhuhr'];

@@ -1,7 +1,7 @@
 // Google Map API Key
-const String placeKey = '';
+const String placeKey = 'AIzaSyDJu-gnqvXH4l4JvSoHM-GgQM-PTmdmyYk';
 
-const String googleMapKey = '';
+const String googleMapKey = 'AIzaSyAew5NxFKADiuNztt9DJ9_8upBa-a_HvMM';
 
 // Google Maps API
 const googleMapsUrl = 'maps.googleapis.com';
