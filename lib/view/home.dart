@@ -79,9 +79,7 @@ class _HomeState extends State<Home> {
                     children: [
                       Column(
                         children: [
-                          const SizedBox(
-                            height: 50,
-                          ),
+                          const SizedBox(height: 10),
                           WaktuSolat(
                             today: homeModel.currentDay,
                             subuh: homeModel.subuhTime,
@@ -89,8 +87,10 @@ class _HomeState extends State<Home> {
                             asar: homeModel.asarTime,
                             maghrib: homeModel.maghribTime,
                             isyak: homeModel.isyakTime,
+                            homeModel: homeModel,
+                            formatter: formatter,
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 10),
                           Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
@@ -109,9 +109,7 @@ class _HomeState extends State<Home> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(20),
                                     child: Image.asset(
-                                      homeModel.currentMeridiem == 'am'
-                                          ? 'assets/images/day_time.jpg'
-                                          : 'assets/images/night_time.jpg',
+                                      homeModel.getDayPicture(),
                                       fit: BoxFit.cover,
                                       opacity:
                                           const AlwaysStoppedAnimation(0.5),
@@ -153,179 +151,185 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                elevation: 8.0,
-                                child: Container(
-                                  width: 160,
-                                  height: 160,
-                                  decoration: BoxDecoration(
+                              Expanded(
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    color: Color(0xFF7DC8E0),
                                   ),
-                                  child: Stack(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                          "assets/images/quran.png",
-                                          fit: BoxFit.cover,
-                                          opacity: AlwaysStoppedAnimation(0.5),
+                                  elevation: 8.0,
+                                  child: Container(
+                                    width: 160,
+                                    height: 160,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: Color(0xFF7DC8E0),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                            "assets/images/quran.png",
+                                            fit: BoxFit.cover,
+                                            opacity:
+                                                AlwaysStoppedAnimation(0.5),
+                                          ),
                                         ),
-                                      ),
-                                      Center(
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              "NUZUL QURAN",
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.staatliches()
-                                                        .fontFamily,
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                                shadows: const [
-                                                  Shadow(
-                                                    color: Colors.black,
-                                                    offset: Offset(1, 1),
-                                                    blurRadius: 5.0,
-                                                  )
-                                                ],
+                                        Center(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "NUZUL QURAN",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.staatliches()
+                                                          .fontFamily,
+                                                  fontSize: 30,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  shadows: const [
+                                                    Shadow(
+                                                      color: Colors.black,
+                                                      offset: Offset(1, 1),
+                                                      blurRadius: 5.0,
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              "144",
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.staatliches()
-                                                        .fontFamily,
-                                                fontSize: 60,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                                shadows: const [
-                                                  Shadow(
-                                                    color: Colors.black,
-                                                    offset: Offset(1, 1),
-                                                    blurRadius: 5.0,
-                                                  )
-                                                ],
+                                              Text(
+                                                "144",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.staatliches()
+                                                          .fontFamily,
+                                                  fontSize: 60,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  shadows: const [
+                                                    Shadow(
+                                                      color: Colors.black,
+                                                      offset: Offset(1, 1),
+                                                      blurRadius: 5.0,
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              "days",
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.montserrat()
-                                                        .fontFamily,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                                shadows: const [
-                                                  Shadow(
-                                                    color: Colors.black,
-                                                    offset: Offset(1, 1),
-                                                    blurRadius: 5.0,
-                                                  )
-                                                ],
+                                              Text(
+                                                "days",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.montserrat()
+                                                          .fontFamily,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  shadows: const [
+                                                    Shadow(
+                                                      color: Colors.black,
+                                                      offset: Offset(1, 1),
+                                                      blurRadius: 5.0,
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                elevation: 8.0,
-                                child: Container(
-                                  width: 160,
-                                  height: 160,
-                                  decoration: BoxDecoration(
+                              Expanded(
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    color: Color.fromARGB(255, 232, 241, 167),
                                   ),
-                                  child: Stack(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                          "assets/images/ketupat.png",
-                                          fit: BoxFit.cover,
-                                          opacity: AlwaysStoppedAnimation(0.5),
+                                  elevation: 8.0,
+                                  child: Container(
+                                    width: 160,
+                                    height: 160,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: Color.fromARGB(255, 232, 241, 167),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                            "assets/images/ketupat.png",
+                                            fit: BoxFit.cover,
+                                            opacity:
+                                                AlwaysStoppedAnimation(0.5),
+                                          ),
                                         ),
-                                      ),
-                                      Center(
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              "EID FITR",
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.staatliches()
-                                                        .fontFamily,
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                                shadows: const [
-                                                  Shadow(
-                                                    color: Colors.black,
-                                                    offset: Offset(1, 1),
-                                                    blurRadius: 5.0,
-                                                  )
-                                                ],
+                                        Center(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "EID FITR",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.staatliches()
+                                                          .fontFamily,
+                                                  fontSize: 30,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  shadows: const [
+                                                    Shadow(
+                                                      color: Colors.black,
+                                                      offset: Offset(1, 1),
+                                                      blurRadius: 5.0,
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              "5",
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.staatliches()
-                                                        .fontFamily,
-                                                fontSize: 60,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                                shadows: const [
-                                                  Shadow(
-                                                    color: Colors.black,
-                                                    offset: Offset(1, 1),
-                                                    blurRadius: 5.0,
-                                                  )
-                                                ],
+                                              Text(
+                                                "5",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.staatliches()
+                                                          .fontFamily,
+                                                  fontSize: 60,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  shadows: const [
+                                                    Shadow(
+                                                      color: Colors.black,
+                                                      offset: Offset(1, 1),
+                                                      blurRadius: 5.0,
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              "days",
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.montserrat()
-                                                        .fontFamily,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                                shadows: const [
-                                                  Shadow(
-                                                    color: Colors.black,
-                                                    offset: Offset(1, 1),
-                                                    blurRadius: 5.0,
-                                                  )
-                                                ],
+                                              Text(
+                                                "days",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.montserrat()
+                                                          .fontFamily,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  shadows: const [
+                                                    Shadow(
+                                                      color: Colors.black,
+                                                      offset: Offset(1, 1),
+                                                      blurRadius: 5.0,
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )

@@ -15,6 +15,7 @@ class HomeModel {
   String currentMeridiem = '';
   double currentLat = 0.0;
   double currentLng = 0.0;
+  bool currentDateFlag = false;
 
   // Waktu Solat
   String currentDay = '';
@@ -23,6 +24,10 @@ class HomeModel {
   String asarTime = '';
   String maghribTime = '';
   String isyakTime = '';
+  List<String> waktuSolatToday = [];
+  String currentWaktuSolat = '';
+  List<String> waktuSolatList = ['Subuh', 'Zohor', 'Asar', 'Maghrib', 'Isyak'];
+  bool waktuSolatFlag = false;
 
   // Get Hijrah Date
   Future<String> getHijrahDate() async {
@@ -32,71 +37,111 @@ class HomeModel {
         Uri.parse('$aladhan$setDate'),
       );
       var data = jsonDecode(response.body);
-      print(data);
+      // print(data['data']['hijri']['holidays'][0]);
       var dayAR = data['data']['hijri']['weekday']['ar'];
       var dayEN = data['data']['hijri']['weekday']['en'];
-      currentHoliday = data['data']['hijri']['holidays'][0];
+
+      if (data['data']['hijri']['holidays'].isEmpty) {
+        currentHoliday = '';
+      } else {
+        currentHoliday = data['data']['hijri']['holidays'][0];
+      }
+
       currentDate = formatter.getCurrentDateFormattedAPI();
       currentDay = "$dayAR, $dayEN";
       currentHijrahDate =
           "${data['data']['hijri']['day']} ${data['data']['hijri']['month']['en']} ${data['data']['hijri']['year']}";
-      return data;
-    } catch (e) {}
+      print(currentHijrahDate);
+      currentDateFlag = true;
+      return currentHijrahDate;
+    } catch (e) {
+      print(e);
+    }
     return '';
   }
 
   Future<String> getLocationName(double latitude, double longitude) async {
-    final String url =
-        'https://$googleMapsUrl/maps/api/geocode/json?latlng=$latitude,$longitude&key=$googleMapKey';
-    final response = await http.get(Uri.parse(url));
+    try {
+      final String url =
+          'https://$googleMapsUrl/maps/api/geocode/json?latlng=$latitude,$longitude&key=$googleMapKey';
+      final response = await http.get(Uri.parse(url));
 
-    final json = jsonDecode(response.body);
+      final json = jsonDecode(response.body);
 
-    if (json['status'] == 'OK') {
-      var results = json['results'] as List<dynamic>;
-      if (results.isNotEmpty) {
-        var addressComponents =
-            results[0]['address_components'] as List<dynamic>;
-        for (var component in addressComponents) {
-          var types = component['types'] as List<dynamic>;
-          if (types.contains('locality')) {
-            print(component['long_name']);
-            currentLocation = component['long_name'] as String;
-            return component['long_name'] as String;
+      if (json['status'] == 'OK') {
+        var results = json['results'] as List<dynamic>;
+        if (results.isNotEmpty) {
+          var addressComponents =
+              results[0]['address_components'] as List<dynamic>;
+          for (var component in addressComponents) {
+            var types = component['types'] as List<dynamic>;
+            if (types.contains('locality')) {
+              print(component['long_name']);
+              currentLocation = component['long_name'] as String;
+              return component['long_name'] as String;
+            }
           }
         }
       }
+    } catch (e) {
+      print(e);
     }
-
-    // Return an empty string if location name couldn't be retrieved
     return '';
   }
 
   Future<Map<String, dynamic>> getWaktuSolatToday(
       double lat, double lng) async {
-    DateTime now = DateTime.now();
-    print("latlng 2 : $lat, $lng");
-    String date = now.toString().split(' ')[0];
-    final String url = '$mpt$lat,$lng';
-    final response = await http.get(Uri.parse(url));
-    final json = jsonDecode(response.body);
-    final jakimCode = json['data']['attributes']['jakim_code'];
+    try {
+      DateTime now = DateTime.now();
+      String date = now.toString().split(' ')[0];
+      final String url = '$mpt$lat,$lng';
+      final response = await http.get(Uri.parse(url));
+      final json = jsonDecode(response.body);
+      final jakimCode = json['data']['attributes']['jakim_code'];
 
-    final String jakimUrl = '$jakimDuration$jakimCode';
+      final String jakimUrl = '$jakimDuration$jakimCode';
 
-    final jakimResponse = await http.post(Uri.parse(jakimUrl), body: {
-      'datestart': date,
-      'dateend': date,
-    });
+      final jakimResponse = await http.post(Uri.parse(jakimUrl), body: {
+        'datestart': date,
+        'dateend': date,
+      });
 
-    final jakimJson = jsonDecode(jakimResponse.body);
+      final jakimJson = jsonDecode(jakimResponse.body);
 
-    subuhTime = jakimJson['prayerTime'][0]['fajr'];
-    zohorTime = jakimJson['prayerTime'][0]['dhuhr'];
-    asarTime = jakimJson['prayerTime'][0]['asr'];
-    maghribTime = jakimJson['prayerTime'][0]['maghrib'];
-    isyakTime = jakimJson['prayerTime'][0]['isha'];
+      subuhTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['fajr']);
+      zohorTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['dhuhr']);
+      asarTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['asr']);
+      maghribTime =
+          formatter.trimSeconds(jakimJson['prayerTime'][0]['maghrib']);
+      isyakTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['isha']);
+      waktuSolatFlag = true;
+    } catch (e) {
+      print(e);
+    }
 
     return {};
+  }
+
+  String getDayPicture() {
+    var hour = DateTime.now().hour;
+
+    if (hour >= 6 && hour < 12) {
+      return 'assets/images/morning_time.jpg';
+    } else if (hour >= 12 && hour < 17) {
+      return 'assets/images/afternoon_time.jpg';
+    } else if (hour >= 17 && hour < 20) {
+      return 'assets/images/evening_time.jpg';
+    } else if (hour >= 20 && hour < 24) {
+      return 'assets/images/night_time.jpg';
+    } else if (hour >= 0 && hour < 6) {
+      return 'assets/images/night_time.jpg';
+    } else {
+      return 'assets/images/morning_time.jpg';
+    }
+  }
+
+  String getcurrentWaktuSolatStatus(String currentWaktuSolat) {
+    print(currentWaktuSolat);
+    return currentWaktuSolat;
   }
 }
