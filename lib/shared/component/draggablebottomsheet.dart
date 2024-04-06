@@ -8,7 +8,7 @@ import 'package:simple_icons/simple_icons.dart';
 
 class DraggableSheet extends StatefulWidget {
   const DraggableSheet({
-    Key? key,
+    super.key,
     required this.sheetController,
     required this.locationNameLarge,
     required this.locationNameSmall,
@@ -24,7 +24,7 @@ class DraggableSheet extends StatefulWidget {
     // Current Lat Long
     required this.currentLat,
     required this.currentLong,
-  }) : super(key: key);
+  });
 
   final DraggableScrollableController sheetController;
   final String locationNameLarge;

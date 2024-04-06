@@ -5,7 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:soleh/model/home_model.dart';
 import 'package:soleh/shared/component/home_header.dart';
 import 'package:soleh/shared/component/scaffoldbackground.dart';
-import 'package:soleh/shared/component/waktusolat.dart';
+import 'package:soleh/shared/component/shimmer.dart';
+import 'package:soleh/shared/component/waktusolat_card.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:location/location.dart';
 import 'package:soleh/themes/colors.dart';
@@ -37,6 +38,7 @@ class _HomeState extends State<Home> {
       },
     );
     homeModel.currentLocation = getLiveLocation();
+    homeModel.getAsmaUlHusna();
     super.initState();
   }
 
@@ -74,13 +76,13 @@ class _HomeState extends State<Home> {
                   currentLocation: homeModel.currentLocation,
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                  padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                   child: Column(
                     children: [
                       Column(
                         children: [
                           const SizedBox(height: 10),
-                          WaktuSolat(
+                          WaktuSolatCard(
                             today: homeModel.currentDay,
                             subuh: homeModel.subuhTime,
                             zohor: homeModel.zohorTime,
@@ -116,36 +118,49 @@ class _HomeState extends State<Home> {
                                     ),
                                   ),
                                   ListTile(
-                                    title: Text(
-                                      homeModel.currentHoliday,
-                                      style: TextStyle(
-                                        fontFamily:
-                                            GoogleFonts.lato().fontFamily,
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      homeModel.currentHijrahDate,
-                                      style: TextStyle(
-                                        fontFamily:
-                                            GoogleFonts.montserrat().fontFamily,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.amber[600],
-                                      ),
-                                    ),
-                                    trailing: Text(
-                                      homeModel.currentDate,
-                                      style: TextStyle(
-                                        fontFamily:
-                                            GoogleFonts.montserrat().fontFamily,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                                    title: homeModel.auhMeaning == ''
+                                        ? const ShimmerLoad(
+                                            height: 20, width: 100)
+                                        : Text(
+                                            homeModel.auhMeaning,
+                                            style: TextStyle(
+                                              fontFamily:
+                                                  GoogleFonts.lato().fontFamily,
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                    subtitle: homeModel.auhAR == '' &&
+                                            homeModel.auhEN == ''
+                                        ? const ShimmerLoad(
+                                            height: 10, width: 60)
+                                        : Text(
+                                            '${homeModel.auhAR} - ${homeModel.auhEN}',
+                                            style: TextStyle(
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.amber[400],
+                                            ),
+                                          ),
+                                    trailing: homeModel.auhAR == '' &&
+                                            homeModel.auhEN == ''
+                                        ? const ShimmerLoad(
+                                            height: 10, width: 60)
+                                        : Text(
+                                            '${homeModel.auhNum}th name',
+                                            style: TextStyle(
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                   )
                                 ],
                               ),
@@ -166,7 +181,7 @@ class _HomeState extends State<Home> {
                                     height: 160,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      color: Color(0xFF7DC8E0),
+                                      color: const Color(0xFF7DC8E0),
                                     ),
                                     child: Stack(
                                       children: [
@@ -176,7 +191,8 @@ class _HomeState extends State<Home> {
                                             "assets/images/quran.png",
                                             fit: BoxFit.cover,
                                             opacity:
-                                                AlwaysStoppedAnimation(0.5),
+                                                const AlwaysStoppedAnimation(
+                                                    0.5),
                                           ),
                                         ),
                                         Center(
@@ -255,7 +271,8 @@ class _HomeState extends State<Home> {
                                     height: 160,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      color: Color.fromARGB(255, 232, 241, 167),
+                                      color: const Color.fromARGB(
+                                          255, 232, 241, 167),
                                     ),
                                     child: Stack(
                                       children: [
@@ -265,7 +282,8 @@ class _HomeState extends State<Home> {
                                             "assets/images/ketupat.png",
                                             fit: BoxFit.cover,
                                             opacity:
-                                                AlwaysStoppedAnimation(0.5),
+                                                const AlwaysStoppedAnimation(
+                                                    0.5),
                                           ),
                                         ),
                                         Center(

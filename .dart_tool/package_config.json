@@ -206,6 +206,12 @@
       "languageVersion": "2.15"
     },
     {
+      "name": "go_router",
+      "rootUri": "file:///C:/Users/SDO-MUKMIN/AppData/Local/Pub/Cache/hosted/pub.dev/go_router-13.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "google_fonts",
       "rootUri": "file:///C:/Users/SDO-MUKMIN/AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.2.1",
       "packageUri": "lib/",
@@ -356,6 +362,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "logging",
+      "rootUri": "file:///C:/Users/SDO-MUKMIN/AppData/Local/Pub/Cache/hosted/pub.dev/logging-1.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "matcher",
       "rootUri": "file:///C:/Users/SDO-MUKMIN/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.16+1",
       "packageUri": "lib/",
@@ -426,6 +438,12 @@
       "rootUri": "file:///C:/Users/SDO-MUKMIN/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_windows-2.2.1",
       "packageUri": "lib/",
       "languageVersion": "2.19"
+    },
+    {
+      "name": "persistent_bottom_nav_bar_v2",
+      "rootUri": "file:///C:/Users/SDO-MUKMIN/AppData/Local/Pub/Cache/hosted/pub.dev/persistent_bottom_nav_bar_v2-5.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "platform",
@@ -674,7 +692,7 @@
       "languageVersion": "3.3"
     }
   ],
-  "generated": "2024-04-04T14:58:41.214636Z",
+  "generated": "2024-04-06T08:18:25.247382Z",
   "generator": "pub",
   "generatorVersion": "3.3.0"
 }

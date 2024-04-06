@@ -14,4 +14,6 @@ String mpt = 'https://mpt.i906.my/api/prayer/';
 String jakimDuration =
     'https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=duration&zone=';
 
-String aladhan = 'https://api.aladhan.com/v1/gToH/';
+String aladhan = 'https://api.aladhan.com/v1/';
+String dateSearch = 'gToH/';
+String asmaUlHusnaSearch = 'asmaAlHusna/';

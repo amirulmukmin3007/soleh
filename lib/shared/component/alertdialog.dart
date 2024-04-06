@@ -4,7 +4,7 @@ import 'package:soleh/themes/fonts.dart';
 
 class RadiusPopupInput extends StatefulWidget {
   const RadiusPopupInput({
-    Key? key,
+    super.key,
     required this.radiusTypeList,
     required this.selectedRadiusType,
     required this.radiusController,
@@ -12,7 +12,7 @@ class RadiusPopupInput extends StatefulWidget {
     required this.onPressed,
     required this.reset,
     required this.radiusFlag,
-  }) : super(key: key);
+  });
 
   final List<String> radiusTypeList;
   final String selectedRadiusType;
@@ -77,7 +77,7 @@ class _RadiusPopupInputState extends State<RadiusPopupInput> {
 }
 
 class RadiusPopupAlert extends StatelessWidget {
-  const RadiusPopupAlert({Key? key}) : super(key: key);
+  const RadiusPopupAlert({super.key});
 
   @override
   Widget build(BuildContext context) {

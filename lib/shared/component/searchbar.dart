@@ -98,10 +98,10 @@ class SearchBarMap extends StatelessWidget {
 
 class LocationListTile extends StatelessWidget {
   const LocationListTile({
-    Key? key,
+    super.key,
     required this.location,
     required this.press,
-  }) : super(key: key);
+  });
 
   final String location;
   final Function(String) press;
@@ -242,12 +242,12 @@ class SearchBarMasjid extends StatelessWidget {
 
 class MasjidListTile extends StatelessWidget {
   const MasjidListTile({
-    Key? key,
+    super.key,
     required this.location,
     required this.serviceType,
     required this.masjid,
     required this.press,
-  }) : super(key: key);
+  });
 
   final String location;
   final String serviceType;

@@ -5,12 +5,12 @@ import 'package:soleh/themes/colors.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
-    Key? key,
+    super.key,
     required this.currentTime,
     required this.currentMeridiem,
     required this.currentHijrahDate,
     required this.currentLocation,
-  }) : super(key: key);
+  });
 
   final String currentTime;
   final String currentMeridiem;
@@ -114,7 +114,7 @@ class HomeHeader extends StatelessWidget {
                       ),
               ],
             ),
-            Column(
+            const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [],
             )

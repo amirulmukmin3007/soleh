@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:soleh/shared/api/general.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
@@ -17,16 +18,32 @@ class HomeModel {
   double currentLng = 0.0;
   bool currentDateFlag = false;
 
+  // Asma Ul Husna
+  Map<String, dynamic> asmaUlHusna = {};
+  String auhMeaning = '';
+  String auhAR = '';
+  String auhEN = '';
+  String auhNum = '';
+  bool auhFlag = false;
+
   // Waktu Solat
   String currentDay = '';
   String subuhTime = '';
+  String syurukTime = '';
   String zohorTime = '';
   String asarTime = '';
   String maghribTime = '';
   String isyakTime = '';
   List<String> waktuSolatToday = [];
   String currentWaktuSolat = '';
-  List<String> waktuSolatList = ['Subuh', 'Zohor', 'Asar', 'Maghrib', 'Isyak'];
+  List<String> waktuSolatList = [
+    'Subuh',
+    'Syuruk',
+    'Zohor',
+    'Asar',
+    'Maghrib',
+    'Isyak'
+  ];
   bool waktuSolatFlag = false;
 
   // Get Hijrah Date
@@ -34,7 +51,7 @@ class HomeModel {
     try {
       String setDate = formatter.getCurrentDateFormattedAPI();
       final response = await http.get(
-        Uri.parse('$aladhan$setDate'),
+        Uri.parse('$aladhan$dateSearch$setDate'),
       );
       var data = jsonDecode(response.body);
       // print(data['data']['hijri']['holidays'][0]);
@@ -51,7 +68,6 @@ class HomeModel {
       currentDay = "$dayAR, $dayEN";
       currentHijrahDate =
           "${data['data']['hijri']['day']} ${data['data']['hijri']['month']['en']} ${data['data']['hijri']['year']}";
-      print(currentHijrahDate);
       currentDateFlag = true;
       return currentHijrahDate;
     } catch (e) {
@@ -76,7 +92,6 @@ class HomeModel {
           for (var component in addressComponents) {
             var types = component['types'] as List<dynamic>;
             if (types.contains('locality')) {
-              print(component['long_name']);
               currentLocation = component['long_name'] as String;
               return component['long_name'] as String;
             }
@@ -109,6 +124,7 @@ class HomeModel {
       final jakimJson = jsonDecode(jakimResponse.body);
 
       subuhTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['fajr']);
+      syurukTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['syuruk']);
       zohorTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['dhuhr']);
       asarTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['asr']);
       maghribTime =
@@ -140,8 +156,20 @@ class HomeModel {
     }
   }
 
-  String getcurrentWaktuSolatStatus(String currentWaktuSolat) {
-    print(currentWaktuSolat);
-    return currentWaktuSolat;
+  Future<void> getAsmaUlHusna() async {
+    try {
+      Random random = Random();
+      int randomNumber = random.nextInt(99) + 1;
+
+      final response = await http.get(
+        Uri.parse('$aladhan$asmaUlHusnaSearch$setDate$randomNumber'),
+      );
+      var data = jsonDecode(response.body);
+      auhMeaning = data['data'][0]['en']['meaning'];
+      auhAR = data['data'][0]['name'];
+      auhEN = data['data'][0]['transliteration'];
+      auhNum = data['data'][0]['number'].toString();
+      print(data['data'][0]['number']);
+    } catch (e) {}
   }
 }
