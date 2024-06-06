@@ -14,7 +14,7 @@ class DraggableSheet extends StatefulWidget {
     required this.locationNameSmall,
 
     // For Masjid only
-    required this.poiFlag,
+    required this.masjidFlag,
     required this.serviceType,
     required this.businessHours,
     required this.lat,
@@ -29,7 +29,7 @@ class DraggableSheet extends StatefulWidget {
   final DraggableScrollableController sheetController;
   final String locationNameLarge;
   final String locationNameSmall;
-  final bool poiFlag;
+  final bool masjidFlag;
 
   final String serviceType;
   final String businessHours;
@@ -94,7 +94,7 @@ class _DraggableSheetState extends State<DraggableSheet> {
                       ),
                       const SizedBox(height: 10),
                       Visibility(
-                        visible: widget.poiFlag,
+                        visible: widget.masjidFlag,
                         child: Row(
                           children: [
                             const Icon(
@@ -122,7 +122,7 @@ class _DraggableSheetState extends State<DraggableSheet> {
               ),
               SliverToBoxAdapter(
                 child: Visibility(
-                  visible: widget.poiFlag,
+                  visible: widget.masjidFlag,
                   child: SizedBox(
                     height: MediaQuery.of(context).size.height * 0.4,
                     child: DefaultTabController(

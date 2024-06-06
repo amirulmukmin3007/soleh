@@ -1,7 +1,8 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
+import 'package:flutter/widgets.dart';
+// import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 import 'package:soleh/themes/colors.dart';
 import 'package:soleh/view/home.dart';
 import 'package:soleh/view/masjid_location.dart';

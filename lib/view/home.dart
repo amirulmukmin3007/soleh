@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:soleh/model/home_model.dart';
+import 'package:soleh/shared/component/asmaulhusna_card.dart';
 import 'package:soleh/shared/component/home_header.dart';
 import 'package:soleh/shared/component/scaffoldbackground.dart';
 import 'package:soleh/shared/component/shimmer.dart';
@@ -10,6 +11,7 @@ import 'package:soleh/shared/component/waktusolat_card.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:location/location.dart';
 import 'package:soleh/themes/colors.dart';
+import 'package:soleh/view/masjid_location.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -39,6 +41,7 @@ class _HomeState extends State<Home> {
     );
     homeModel.currentLocation = getLiveLocation();
     homeModel.getAsmaUlHusna();
+    print("Current latlng : ${homeModel.currentLat}, ${homeModel.currentLng}");
     super.initState();
   }
 
@@ -50,6 +53,9 @@ class _HomeState extends State<Home> {
       var locationName =
           homeModel.getLocationName(homeModel.currentLat, homeModel.currentLng);
       homeModel.getWaktuSolatToday(homeModel.currentLat, homeModel.currentLng);
+      print(
+          "Current latlng : ${homeModel.currentLat}, ${homeModel.currentLng}");
+
       return locationName;
     });
     return '';
@@ -57,12 +63,14 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: ColorTheme.primary,
-      ),
-    );
     return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        setState(() {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return const MasjidLocation();
+          }));
+        });
+      }),
       backgroundColor: Colors.transparent,
       body: ScaffoldBackground(
         child: SafeArea(
@@ -93,79 +101,7 @@ class _HomeState extends State<Home> {
                             formatter: formatter,
                           ),
                           const SizedBox(height: 10),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            elevation: 8.0,
-                            child: Container(
-                              width: double.infinity,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                color: Colors.black87,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: Image.asset(
-                                      homeModel.getDayPicture(),
-                                      fit: BoxFit.cover,
-                                      opacity:
-                                          const AlwaysStoppedAnimation(0.5),
-                                    ),
-                                  ),
-                                  ListTile(
-                                    title: homeModel.auhMeaning == ''
-                                        ? const ShimmerLoad(
-                                            height: 20, width: 100)
-                                        : Text(
-                                            homeModel.auhMeaning,
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  GoogleFonts.lato().fontFamily,
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                    subtitle: homeModel.auhAR == '' &&
-                                            homeModel.auhEN == ''
-                                        ? const ShimmerLoad(
-                                            height: 10, width: 60)
-                                        : Text(
-                                            '${homeModel.auhAR} - ${homeModel.auhEN}',
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  GoogleFonts.montserrat()
-                                                      .fontFamily,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.amber[400],
-                                            ),
-                                          ),
-                                    trailing: homeModel.auhAR == '' &&
-                                            homeModel.auhEN == ''
-                                        ? const ShimmerLoad(
-                                            height: 10, width: 60)
-                                        : Text(
-                                            '${homeModel.auhNum}th name',
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  GoogleFonts.montserrat()
-                                                      .fontFamily,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
+                          AsmaUlHusnaCard(homeModel: homeModel),
                           const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

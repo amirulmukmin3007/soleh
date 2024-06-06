@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' show cos, sqrt, asin;
 import 'dart:isolate';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:soleh/shared/api/general.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/functions/formatter.dart';
@@ -14,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class MapModel {
   final unfocusNode = FocusNode();
@@ -58,8 +60,8 @@ class MapModel {
   // Draggable Sheet
   late String dragLocationNameLarge = '';
   late String dragLocationNameSmall = '';
-  late String dragServiceType = '';
-  late String dragBusinessHours = '';
+  late String dragDistrict = '';
+  late String dragNoTel = '';
   late String dragLat = '';
   late String dragLong = '';
   late String dragDistance = '';
@@ -222,41 +224,114 @@ class MapModel {
     mapController.move(location, 20);
   }
 
-  void getDatapoints(SendPort sendPort) async {
-    // int count = 0;
+  // void getDatapoints(SendPort sendPort) async {
+  //   // int count = 0;
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse(
+  //         // 'https://devmap.zen.com.my/wp-json/mobile_app/googlemaps/datapoints',
+  //         'https://pakejexternal.mooo.com/api/rangkaian',
+  //       ),
+  //     );
+  //     var data = jsonDecode(response.body);
+  //     if (data is List) {
+  //       for (var point in data) {
+  //         String markerImage = setMarkerType(point['service_type']);
+  //         // print(count++);
+  //         Marker marker = Marker(
+  //           key: Key(point['refid'].toString()),
+  //           width: 40.0,
+  //           height: 40.0,
+  //           point:
+  //               LatLng(double.parse(point['lat']), double.parse(point['lng'])),
+  //           child: Image.asset(markerImage),
+  //         );
+  //         parentClusterMarkersInfo.add(point);
+  //         parentClusterMarkers.add(marker);
+  //       }
+  //       print('Cluster markers count: ${parentClusterMarkersInfo.length}');
+  //       clusterFlag = true;
+  //       ClusterMarkersDataPacket packet = ClusterMarkersDataPacket(
+  //           parentClusterMarkers, parentClusterMarkersInfo, clusterFlag);
+  //       sendPort.send(packet);
+  //     }
+  //   } catch (e) {
+  //     // Handle error
+  //     print('error');
+  //   }
+  // }
+
+  // Future<void> getDatapoints(SendPort sendPort) async {
+  //   try {
+  //     String jsonString =
+  //         await rootBundle.loadString('assets/datasets/senarai_masjid.json');
+  //     var data = jsonDecode(jsonString);
+  //     data = data['Sheet1'];
+
+  //     print(data);
+
+  //     if (data is List) {
+  //       for (var point in data) {
+  //         print('Nice');
+  //         // String markerImage = setMarkerType(point['service_type']);
+  //         Marker marker = Marker(
+  //           key: Key(point['refid'].toString()),
+  //           width: 40.0,
+  //           height: 40.0,
+  //           point: LatLng(point['lat'], point['lng']),
+  //           child: Icon(FluentIcons.location_16_regular),
+  //         );
+  //         parentClusterMarkersInfo.add(point);
+  //         parentClusterMarkers.add(marker);
+  //       }
+  //       print('Cluster markers count: ${parentClusterMarkersInfo.length}');
+  //       clusterFlag = true;
+  //       ClusterMarkersDataPacket packet = ClusterMarkersDataPacket(
+  //           parentClusterMarkers, parentClusterMarkersInfo, clusterFlag);
+  //       sendPort.send(packet);
+  //     }
+  //   } catch (e) {
+  //     // Handle error
+  //     print('Error: $e');
+  //   }
+  // }
+
+  Future<ClusterMarkersDataPacket> getDatapoints() async {
     try {
-      final response = await http.get(
-        Uri.parse(
-          // 'https://devmap.zen.com.my/wp-json/mobile_app/googlemaps/datapoints',
-          'https://pakejexternal.mooo.com/api/rangkaian',
-        ),
-      );
-      var data = jsonDecode(response.body);
+      String jsonString =
+          await rootBundle.loadString('assets/datasets/senarai_masjid.json');
+      var data = jsonDecode(jsonString);
+      data = data['Sheet1'];
+
+      print(data);
+
       if (data is List) {
         for (var point in data) {
-          String markerImage = setMarkerType(point['service_type']);
-          // print(count++);
+          print('Nice');
+          // String markerImage = setMarkerType(point['service_type']);
           Marker marker = Marker(
             key: Key(point['refid'].toString()),
             width: 40.0,
             height: 40.0,
-            point:
-                LatLng(double.parse(point['lat']), double.parse(point['lng'])),
-            child: Image.asset(markerImage),
+            point: LatLng(point['lat'], point['lng']),
+            child: Icon(FluentIcons.location_16_regular),
           );
           parentClusterMarkersInfo.add(point);
           parentClusterMarkers.add(marker);
         }
         print('Cluster markers count: ${parentClusterMarkersInfo.length}');
         clusterFlag = true;
-        ClusterMarkersDataPacket packet = ClusterMarkersDataPacket(
-            parentClusterMarkers, parentClusterMarkersInfo, clusterFlag);
-        sendPort.send(packet);
       }
     } catch (e) {
       // Handle error
-      print('error');
+      print('Error: $e');
     }
+
+    return ClusterMarkersDataPacket(
+      markers: parentClusterMarkers,
+      markersInfo: parentClusterMarkersInfo,
+      clusterFlag: clusterFlag,
+    );
   }
 
   String setMarkerType(String type) {
@@ -366,5 +441,8 @@ class ClusterMarkersDataPacket {
   final List<Map<String, dynamic>> markersInfo;
   final bool clusterFlag;
 
-  ClusterMarkersDataPacket(this.markers, this.markersInfo, this.clusterFlag);
+  ClusterMarkersDataPacket(
+      {required this.markers,
+      required this.markersInfo,
+      required this.clusterFlag});
 }
