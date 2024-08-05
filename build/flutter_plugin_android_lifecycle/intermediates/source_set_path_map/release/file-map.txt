@@ -1,0 +1,12 @@
+io.flutter.plugins.flutter_plugin_android_lifecycle-jetified-window-1.0.0-beta04-0 C:\Users\SDO-MUKMIN\.gradle\caches\transforms-3\0070cf36121aeeb4a714234b9f52d8b7\transformed\jetified-window-1.0.0-beta04\res
+io.flutter.plugins.flutter_plugin_android_lifecycle-jetified-window-java-1.0.0-beta04-1 C:\Users\SDO-MUKMIN\.gradle\caches\transforms-3\014cc38c8408df31dc73bb9bf5f51109\transformed\jetified-window-java-1.0.0-beta04\res
+io.flutter.plugins.flutter_plugin_android_lifecycle-jetified-annotation-experimental-1.1.0-2 C:\Users\SDO-MUKMIN\.gradle\caches\transforms-3\8483d258be040f0e5637047229a1798a\transformed\jetified-annotation-experimental-1.1.0\res
+io.flutter.plugins.flutter_plugin_android_lifecycle-core-1.6.0-3 C:\Users\SDO-MUKMIN\.gradle\caches\transforms-3\8999a62093f7e551ced3b07caff7e38a\transformed\core-1.6.0\res
+io.flutter.plugins.flutter_plugin_android_lifecycle-main-4 C:\Users\SDO-MUKMIN\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.17\android\src\main\res
+io.flutter.plugins.flutter_plugin_android_lifecycle-release-5 C:\Users\SDO-MUKMIN\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.17\android\src\release\res
+io.flutter.plugins.flutter_plugin_android_lifecycle-pngs-6 C:\Users\SDO-MUKMIN\Documents\GitHub\soleh\build\flutter_plugin_android_lifecycle\generated\res\pngs\release
+io.flutter.plugins.flutter_plugin_android_lifecycle-resValues-7 C:\Users\SDO-MUKMIN\Documents\GitHub\soleh\build\flutter_plugin_android_lifecycle\generated\res\resValues\release
+io.flutter.plugins.flutter_plugin_android_lifecycle-rs-8 C:\Users\SDO-MUKMIN\Documents\GitHub\soleh\build\flutter_plugin_android_lifecycle\generated\res\rs\release
+io.flutter.plugins.flutter_plugin_android_lifecycle-mergeReleaseResources-9 C:\Users\SDO-MUKMIN\Documents\GitHub\soleh\build\flutter_plugin_android_lifecycle\intermediates\incremental\release\mergeReleaseResources\merged.dir
+io.flutter.plugins.flutter_plugin_android_lifecycle-mergeReleaseResources-10 C:\Users\SDO-MUKMIN\Documents\GitHub\soleh\build\flutter_plugin_android_lifecycle\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+io.flutter.plugins.flutter_plugin_android_lifecycle-merged_res-11 C:\Users\SDO-MUKMIN\Documents\GitHub\soleh\build\flutter_plugin_android_lifecycle\intermediates\merged_res\release

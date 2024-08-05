@@ -92,6 +92,8 @@ class Formatter {
       List<String> waktuSolatToday, List<String> waktuSolatList) {
     TimeOfDay currentTime = TimeOfDay.now();
 
+    print(waktuSolatToday.toString() + ' ' + waktuSolatList.toString());
+
     List<TimeOfDay> times = waktuSolatToday.map((waktuSolat) {
       List<String> parts = waktuSolat.split(':');
       int hour = int.parse(parts[0]);
@@ -99,22 +101,25 @@ class Formatter {
       return TimeOfDay(hour: hour, minute: minute);
     }).toList();
 
-    if (currentTime.hour < times[0].hour ||
-        (currentTime.hour == times[0].hour &&
-            currentTime.minute < times[0].minute)) {
-      return waktuSolatList[waktuSolatList.length - 1];
-    }
-
-    // Iterate through the prayer times
     for (int i = 0; i < times.length; i++) {
-      if (times[i].hour > currentTime.hour ||
-          (times[i].hour == currentTime.hour &&
-              times[i].minute > currentTime.minute)) {
-        return waktuSolatList[i];
+      TimeOfDay start = times[i];
+      TimeOfDay end = (i + 1 < times.length)
+          ? times[i + 1]
+          : times[0]; // Wrap around to the first time
+
+      // Check if the current time is between the start and end times
+      if (currentTime.hour > start.hour ||
+          (currentTime.hour == start.hour &&
+              currentTime.minute >= start.minute)) {
+        if (currentTime.hour < end.hour ||
+            (currentTime.hour == end.hour && currentTime.minute < end.minute)) {
+          return waktuSolatList[i];
+        }
       }
     }
 
-    return '';
+    // If no match is found, wrap around to the last prayer time
+    return waktuSolatList[waktuSolatList.length - 1];
   }
 
   String trimSeconds(String timeString) {

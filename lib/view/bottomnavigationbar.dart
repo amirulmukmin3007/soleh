@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 // import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 import 'package:soleh/themes/colors.dart';
 import 'package:soleh/view/home.dart';
-import 'package:soleh/view/masjid_location.dart';
+import 'package:soleh/view/map.dart';
 import 'package:soleh/view/qibla.dart';
 import 'package:soleh/view/settings.dart';
 
@@ -18,47 +18,53 @@ class AppNavBar extends StatefulWidget {
 
 class _AppNavBarState extends State<AppNavBar> {
   int currentPageIndex = 0;
+  List<bool> pageFlags = [true, false, false, false];
+
+  void ifActive(int index) {
+    setState(() {
+      for (int i = 0; i < pageFlags.length; i++) {
+        pageFlags[i] = i == index;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: AnimatedBottomNavigationBar(
-        gapLocation: GapLocation.none,
-        activeIndex: currentPageIndex,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentPageIndex,
         onTap: (index) {
           setState(() {
             currentPageIndex = index;
+            ifActive(index);
           });
         },
-        icons: const [
-          FluentIcons.home_24_filled,
-          FluentIcons.compass_northwest_16_filled,
-          FluentIcons.location_24_filled,
-          FluentIcons.settings_16_filled,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(FluentIcons.home_24_filled),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(FluentIcons.compass_northwest_16_filled),
+            label: 'Qibla',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(FluentIcons.location_24_filled),
+            label: 'Map',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(FluentIcons.settings_16_filled),
+            label: 'Settings',
+          ),
         ],
-        activeColor: ColorTheme.primary,
-        inactiveColor: const Color.fromARGB(255, 154, 175, 156),
+        selectedItemColor: ColorTheme.primary,
+        unselectedItemColor: const Color.fromARGB(255, 154, 175, 156),
       ),
-
-      // SlidingClippedNavBar(
-      //   backgroundColor: Colors.white,
-      //   selectedIndex: currentPageIndex,
-      //   barItems: [
-      //     BarItem(title: 'Home', icon: FluentIcons.home_24_filled),
-      //     BarItem(title: 'Mosque', icon: FluentIcons.location_24_filled),
-      //   ],
-      //   onButtonPressed: (index) {
-      //     setState(() {
-      //       currentPageIndex = index;
-      //     });
-      //   },
-      //   activeColor: ColorTheme.primary,
-      // ),
-      body: IndexedStack(index: currentPageIndex, children: const [
-        Home(),
-        MasjidLocation(),
-        Qibla(),
-        Settings(),
+      body: IndexedStack(index: currentPageIndex, children: [
+        Home(isActive: pageFlags[0]),
+        Qibla(isActive: pageFlags[1]),
+        MosqueMap(isActive: pageFlags[2]),
+        Settings(isActive: pageFlags[3]),
       ]),
     );
   }

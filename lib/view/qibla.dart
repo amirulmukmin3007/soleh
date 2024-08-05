@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 class Qibla extends StatefulWidget {
   static const routeName = '/qibla';
-  const Qibla({super.key});
+  const Qibla({super.key, required this.isActive});
+
+  final bool isActive;
 
   @override
   State<Qibla> createState() => _QiblaState();

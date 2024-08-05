@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:soleh/model/home_model.dart';
+import 'package:soleh/provider/asma_ul_husna_provider.dart';
 import 'package:soleh/shared/component/shimmer.dart';
 
 class AsmaUlHusnaCard extends StatefulWidget {
-  const AsmaUlHusnaCard({required this.homeModel, super.key});
+  const AsmaUlHusnaCard(
+      {required this.asmaUlHusnaProvider, required this.homeModel, super.key});
 
+  final AsmaUlHusnaProvider asmaUlHusnaProvider;
   final HomeModel homeModel;
 
   @override
@@ -15,67 +18,60 @@ class AsmaUlHusnaCard extends StatefulWidget {
 class _AsmaUlHusnaCardState extends State<AsmaUlHusnaCard> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Material(
       elevation: 8.0,
+      borderRadius: BorderRadius.circular(20),
       child: Container(
-        width: double.infinity,
-        height: 120,
         decoration: BoxDecoration(
           color: Colors.black87,
           borderRadius: BorderRadius.circular(20),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                widget.homeModel.getDayPicture(),
-                fit: BoxFit.cover,
-                opacity: const AlwaysStoppedAnimation(0.5),
-              ),
+          image: DecorationImage(
+            image: AssetImage(
+              widget.homeModel.getDayPicture(),
             ),
-            ListTile(
-              title: widget.homeModel.auhMeaning == ''
-                  ? const ShimmerLoad(height: 20, width: 100)
-                  : Text(
-                      widget.homeModel.auhMeaning,
-                      style: TextStyle(
-                        fontFamily: GoogleFonts.lato().fontFamily,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+            fit: BoxFit.cover,
+            opacity: 0.5,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListTile(
+            title: widget.asmaUlHusnaProvider.meaning == ''
+                ? const ShimmerLoad(height: 20, width: 100)
+                : Text(
+                    widget.asmaUlHusnaProvider.meaning,
+                    style: TextStyle(
+                      fontFamily: GoogleFonts.lato().fontFamily,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-              subtitle:
-                  widget.homeModel.auhAR == '' && widget.homeModel.auhEN == ''
-                      ? const ShimmerLoad(height: 10, width: 60)
-                      : Text(
-                          '${widget.homeModel.auhAR} - ${widget.homeModel.auhEN}',
-                          style: TextStyle(
-                            fontFamily: GoogleFonts.montserrat().fontFamily,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.amber[400],
-                          ),
-                        ),
-              trailing:
-                  widget.homeModel.auhAR == '' && widget.homeModel.auhEN == ''
-                      ? const ShimmerLoad(height: 10, width: 60)
-                      : Text(
-                          '${widget.homeModel.auhNum}th name',
-                          style: TextStyle(
-                            fontFamily: GoogleFonts.montserrat().fontFamily,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-            )
-          ],
+                  ),
+            subtitle: widget.asmaUlHusnaProvider.inArabic == '' &&
+                    widget.asmaUlHusnaProvider.inEnglish == ''
+                ? const ShimmerLoad(height: 10, width: 60)
+                : Text(
+                    '${widget.asmaUlHusnaProvider.inArabic} - ${widget.asmaUlHusnaProvider.inEnglish}',
+                    style: TextStyle(
+                      fontFamily: GoogleFonts.montserrat().fontFamily,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber[400],
+                    ),
+                  ),
+            trailing: widget.asmaUlHusnaProvider.inArabic == '' &&
+                    widget.asmaUlHusnaProvider.inEnglish == ''
+                ? const ShimmerLoad(height: 10, width: 60)
+                : Text(
+                    '${widget.asmaUlHusnaProvider.number}th name',
+                    style: TextStyle(
+                      fontFamily: GoogleFonts.montserrat().fontFamily,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
         ),
       ),
     );

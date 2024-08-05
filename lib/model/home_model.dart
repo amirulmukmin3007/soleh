@@ -1,82 +1,123 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
+import 'package:soleh/provider/asma_ul_husna_provider.dart';
+import 'package:soleh/provider/location_provider.dart';
+import 'package:soleh/provider/waktu_solat_provider.dart';
 import 'package:soleh/shared/api/general.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 
 class HomeModel {
   Formatter formatter = Formatter();
-  String currentHijrahDate = '';
-  String currentLocation = '';
-  String setDate = '';
-  String currentDate = '';
   String currentHoliday = '';
-  String currentTime = '';
-  String currentMeridiem = '';
-  double currentLat = 0.0;
-  double currentLng = 0.0;
-  bool currentDateFlag = false;
+  String currentDate = '';
+  String currentDay = '';
+  String currentHijrahDate = '';
 
   // Asma Ul Husna
-  Map<String, dynamic> asmaUlHusna = {};
   String auhMeaning = '';
   String auhAR = '';
   String auhEN = '';
   String auhNum = '';
-  bool auhFlag = false;
 
-  // Waktu Solat
-  String currentDay = '';
+  // String currentDay = '';
   String subuhTime = '';
   String syurukTime = '';
   String zohorTime = '';
   String asarTime = '';
   String maghribTime = '';
   String isyakTime = '';
-  List<String> waktuSolatToday = [];
-  String currentWaktuSolat = '';
-  List<String> waktuSolatList = [
-    'Subuh',
-    'Syuruk',
-    'Zohor',
-    'Asar',
-    'Maghrib',
-    'Isyak'
-  ];
-  bool waktuSolatFlag = false;
+  // bool waktuSolatFlag = false;
+
+  Future<void> getLiveLocation(LocationProvider locationProvider) async {
+    Location location = Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        print('Location service is disabled.');
+        return;
+      }
+    }
+
+    // Check for location permission
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        // Handle permission denied
+        print('Location permission denied.');
+        return;
+      }
+    }
+
+    try {
+      var locData = await location.getLocation();
+
+      if (locationProvider.currentLatitude.toString() ==
+              locData.latitude.toString() &&
+          locationProvider.currentLongitude.toString() ==
+              locData.longitude.toString()) {
+      } else {
+        locationProvider.updateLocation(locData, locData.latitude?.toDouble(),
+            locData.longitude?.toDouble());
+      }
+      print(locationProvider.currentLatitude.toString() +
+          ', ' +
+          locationProvider.currentLongitude.toString());
+    } catch (e) {
+      // Handle any other exceptions
+      print('Error getting location: $e');
+    }
+  }
 
   // Get Hijrah Date
   Future<String> getHijrahDate() async {
     try {
       String setDate = formatter.getCurrentDateFormattedAPI();
+
       final response = await http.get(
         Uri.parse('$aladhan$dateSearch$setDate'),
       );
-      var data = jsonDecode(response.body);
-      // print(data['data']['hijri']['holidays'][0]);
-      var dayAR = data['data']['hijri']['weekday']['ar'];
-      var dayEN = data['data']['hijri']['weekday']['en'];
 
-      if (data['data']['hijri']['holidays'].isEmpty) {
-        currentHoliday = '';
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        if (data['data'] != null && data['data']['hijri'] != null) {
+          var dayAR = data['data']['hijri']['weekday']['ar'];
+          var dayEN = data['data']['hijri']['weekday']['en'];
+
+          if (data['data']['hijri']['holidays'].isEmpty) {
+            currentHoliday = '';
+          } else {
+            currentHoliday = data['data']['hijri']['holidays'][0];
+          }
+
+          currentDate = formatter.getCurrentDateFormattedAPI();
+          currentDay = "$dayAR, $dayEN";
+          currentHijrahDate =
+              "${data['data']['hijri']['day']} ${data['data']['hijri']['month']['en']} ${data['data']['hijri']['year']}";
+          return currentHijrahDate;
+        } else {
+          print('Invalid JSON structure: Missing hijri data');
+        }
       } else {
-        currentHoliday = data['data']['hijri']['holidays'][0];
+        print(
+            'Failed to fetch Hijrah date. Status code: ${response.statusCode}');
       }
-
-      currentDate = formatter.getCurrentDateFormattedAPI();
-      currentDay = "$dayAR, $dayEN";
-      currentHijrahDate =
-          "${data['data']['hijri']['day']} ${data['data']['hijri']['month']['en']} ${data['data']['hijri']['year']}";
-      currentDateFlag = true;
-      return currentHijrahDate;
     } catch (e) {
-      print(e);
+      print('Error in getHijrahDate: $e');
     }
     return '';
   }
 
-  Future<String> getLocationName(double latitude, double longitude) async {
+  Future<String> getLocationName(LocationProvider locationProvider,
+      double latitude, double longitude) async {
     try {
       final String url =
           'https://$googleMapsUrl/maps/api/geocode/json?latlng=$latitude,$longitude&key=$googleMapKey';
@@ -92,7 +133,9 @@ class HomeModel {
           for (var component in addressComponents) {
             var types = component['types'] as List<dynamic>;
             if (types.contains('locality')) {
-              currentLocation = component['long_name'] as String;
+              locationProvider
+                  .updateLocationName(component['long_name'] as String);
+              print(component['long_name']);
               return component['long_name'] as String;
             }
           }
@@ -105,34 +148,61 @@ class HomeModel {
   }
 
   Future<Map<String, dynamic>> getWaktuSolatToday(
-      double lat, double lng) async {
+      WaktuSolatProvider waktuSolatProvider, double lat, double lng) async {
     try {
       DateTime now = DateTime.now();
       String date = now.toString().split(' ')[0];
       final String url = '$mpt$lat,$lng';
       final response = await http.get(Uri.parse(url));
-      final json = jsonDecode(response.body);
-      final jakimCode = json['data']['attributes']['jakim_code'];
 
-      final String jakimUrl = '$jakimDuration$jakimCode';
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
 
-      final jakimResponse = await http.post(Uri.parse(jakimUrl), body: {
-        'datestart': date,
-        'dateend': date,
-      });
+        if (json['data'] != null && json['data']['attributes'] != null) {
+          final jakimCode = json['data']['attributes']['jakim_code'];
+          final String jakimUrl = '$jakimDuration$jakimCode';
+          final jakimResponse = await http.post(Uri.parse(jakimUrl), body: {
+            'datestart': date,
+            'dateend': date,
+          });
 
-      final jakimJson = jsonDecode(jakimResponse.body);
+          if (jakimResponse.statusCode == 200) {
+            final jakimJson = jsonDecode(jakimResponse.body);
 
-      subuhTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['fajr']);
-      syurukTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['syuruk']);
-      zohorTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['dhuhr']);
-      asarTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['asr']);
-      maghribTime =
-          formatter.trimSeconds(jakimJson['prayerTime'][0]['maghrib']);
-      isyakTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['isha']);
-      waktuSolatFlag = true;
+            subuhTime =
+                formatter.trimSeconds(jakimJson['prayerTime'][0]['fajr']);
+            syurukTime =
+                formatter.trimSeconds(jakimJson['prayerTime'][0]['syuruk']);
+            zohorTime =
+                formatter.trimSeconds(jakimJson['prayerTime'][0]['dhuhr']);
+            asarTime = formatter.trimSeconds(jakimJson['prayerTime'][0]['asr']);
+            maghribTime =
+                formatter.trimSeconds(jakimJson['prayerTime'][0]['maghrib']);
+            isyakTime =
+                formatter.trimSeconds(jakimJson['prayerTime'][0]['isha']);
+
+            waktuSolatProvider.updateWaktuSolatToday(
+              true,
+              subuhTime,
+              syurukTime,
+              zohorTime,
+              asarTime,
+              maghribTime,
+              isyakTime,
+            );
+          } else {
+            print(
+                'Failed to fetch Jakim data. Status code: ${jakimResponse.statusCode}');
+          }
+        } else {
+          print('Invalid JSON structure: Missing attributes');
+        }
+      } else {
+        print(
+            'Failed to fetch prayer times. Status code: ${response.statusCode}');
+      }
     } catch (e) {
-      print(e);
+      print('Error in getWaktuSolatToday: $e');
     }
 
     return {};
@@ -156,20 +226,24 @@ class HomeModel {
     }
   }
 
-  Future<void> getAsmaUlHusna() async {
+  Future<void> getAsmaUlHusna(AsmaUlHusnaProvider auhProvider) async {
     try {
       Random random = Random();
       int randomNumber = random.nextInt(99) + 1;
 
       final response = await http.get(
-        Uri.parse('$aladhan$asmaUlHusnaSearch$setDate$randomNumber'),
+        Uri.parse('$aladhan$asmaUlHusnaSearch$randomNumber'),
       );
       var data = jsonDecode(response.body);
+      print(data);
       auhMeaning = data['data'][0]['en']['meaning'];
       auhAR = data['data'][0]['name'];
       auhEN = data['data'][0]['transliteration'];
       auhNum = data['data'][0]['number'].toString();
+      auhProvider.updateAsmaUlHusna(auhMeaning, auhAR, auhEN, auhNum);
       print(data['data'][0]['number']);
-    } catch (e) {}
+    } catch (e) {
+      print('Error in getAsmaUlHusna: $e');
+    }
   }
 }

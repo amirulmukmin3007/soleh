@@ -1,8 +1,9 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
-import 'package:soleh/model/map_model.dart';
+import 'package:soleh/model/masjid_location_model.dart';
 import 'package:soleh/shared/component/infobar.dart';
+import 'package:soleh/themes/colors.dart';
 import 'package:soleh/themes/fonts.dart';
 import 'package:simple_icons/simple_icons.dart';
 
@@ -10,13 +11,13 @@ class DraggableSheet extends StatefulWidget {
   const DraggableSheet({
     super.key,
     required this.sheetController,
-    required this.locationNameLarge,
-    required this.locationNameSmall,
+    required this.place,
+    required this.address,
 
     // For Masjid only
-    required this.masjidFlag,
-    required this.serviceType,
-    required this.businessHours,
+    required this.mosqueFlag,
+    required this.state,
+    required this.poskod,
     required this.lat,
     required this.long,
     required this.distance,
@@ -27,12 +28,12 @@ class DraggableSheet extends StatefulWidget {
   });
 
   final DraggableScrollableController sheetController;
-  final String locationNameLarge;
-  final String locationNameSmall;
-  final bool masjidFlag;
+  final String place;
+  final String address;
+  final bool mosqueFlag;
 
-  final String serviceType;
-  final String businessHours;
+  final String state;
+  final String poskod;
   final String lat;
   final String long;
   final String distance;
@@ -77,7 +78,7 @@ class _DraggableSheetState extends State<DraggableSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.locationNameLarge,
+                        widget.place,
                         maxLines: 1,
                         style: TextStyle(
                           fontFamily: fontTheme.fontFamily,
@@ -86,7 +87,7 @@ class _DraggableSheetState extends State<DraggableSheet> {
                         ),
                       ),
                       Text(
-                        widget.locationNameSmall,
+                        widget.address,
                         style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
@@ -94,7 +95,7 @@ class _DraggableSheetState extends State<DraggableSheet> {
                       ),
                       const SizedBox(height: 10),
                       Visibility(
-                        visible: widget.masjidFlag,
+                        visible: widget.mosqueFlag,
                         child: Row(
                           children: [
                             const Icon(
@@ -122,7 +123,7 @@ class _DraggableSheetState extends State<DraggableSheet> {
               ),
               SliverToBoxAdapter(
                 child: Visibility(
-                  visible: widget.masjidFlag,
+                  visible: widget.mosqueFlag,
                   child: SizedBox(
                     height: MediaQuery.of(context).size.height * 0.4,
                     child: DefaultTabController(
@@ -130,36 +131,40 @@ class _DraggableSheetState extends State<DraggableSheet> {
                       child: Column(
                         children: [
                           const TabBar(
+                            indicatorColor: ColorTheme.primary,
+                            labelColor: ColorTheme.primary,
                             tabs: [
                               Tab(icon: Icon(FluentIcons.location_16_filled)),
                               Tab(icon: Icon(FluentIcons.directions_16_filled)),
                             ],
                           ),
                           Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TabBarView(
-                                children: [
-                                  SingleChildScrollView(
+                            child: TabBarView(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SingleChildScrollView(
                                     child: Column(
                                       children: [
                                         const SizedBox(height: 10),
                                         InfoBar(
-                                          textDisplay: widget.serviceType,
-                                          icon: FluentIcons.handshake_16_filled,
-                                          iconBackgroundColor:
-                                              const Color.fromARGB(
-                                                  255, 200, 180, 255),
-                                          iconColor: const Color(0xFF6750a4),
+                                          textDisplay: widget.state,
+                                          icon: FluentIcons
+                                              .building_home_16_filled,
+                                          iconBackgroundColor: ColorTheme
+                                              .primary
+                                              .withOpacity(0.4),
+                                          iconColor: ColorTheme.primary,
                                         ),
                                         const SizedBox(height: 10),
                                         InfoBar(
-                                          textDisplay: widget.businessHours,
-                                          icon: FluentIcons.clock_16_filled,
-                                          iconBackgroundColor:
-                                              const Color.fromARGB(
-                                                  255, 200, 180, 255),
-                                          iconColor: const Color(0xFF6750a4),
+                                          textDisplay: widget.poskod,
+                                          icon:
+                                              FluentIcons.street_sign_20_filled,
+                                          iconBackgroundColor: ColorTheme
+                                              .primary
+                                              .withOpacity(0.4),
+                                          iconColor: ColorTheme.primary,
                                         ),
                                         const SizedBox(height: 10),
                                         InfoBar(
@@ -167,15 +172,18 @@ class _DraggableSheetState extends State<DraggableSheet> {
                                               '${widget.lat}, ${widget.long}',
                                           icon: FluentIcons
                                               .location_arrow_16_filled,
-                                          iconBackgroundColor:
-                                              const Color.fromARGB(
-                                                  255, 200, 180, 255),
-                                          iconColor: const Color(0xFF6750a4),
+                                          iconBackgroundColor: ColorTheme
+                                              .primary
+                                              .withOpacity(0.4),
+                                          iconColor: ColorTheme.primary,
                                         ),
                                       ],
                                     ),
                                   ),
-                                  SingleChildScrollView(
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SingleChildScrollView(
                                     child: Column(
                                       children: [
                                         const SizedBox(height: 10),
@@ -200,6 +208,13 @@ class _DraggableSheetState extends State<DraggableSheet> {
                                         const SizedBox(height: 10),
                                         InfoBarClickable(
                                           function: () {
+                                            print(widget.currentLat +
+                                                ' ' +
+                                                widget.currentLong +
+                                                ' ' +
+                                                widget.lat +
+                                                ' ' +
+                                                widget.long);
                                             MapModel().openNavigationURL(
                                               'googlemaps',
                                               widget.currentLat,
@@ -220,8 +235,8 @@ class _DraggableSheetState extends State<DraggableSheet> {
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           )
                         ],

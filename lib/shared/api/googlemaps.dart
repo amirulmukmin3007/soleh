@@ -1,9 +1,9 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Google Map API Key
-String placeKey = dotenv.env['GOOGLEMAPKEY'] as String;
+String placeKey = dotenv.env['GOOGLEMAPPLACEKEY'] as String;
 
-String googleMapKey = dotenv.env['GOOGLEMAPPLACEKEY'] as String;
+String googleMapKey = dotenv.env['GOOGLEMAPKEY'] as String;
 // Google Maps API
 const googleMapsUrl = 'maps.googleapis.com';
 

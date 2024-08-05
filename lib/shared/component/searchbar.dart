@@ -13,6 +13,7 @@ class SearchBarMap extends StatelessWidget {
     required this.back,
     required this.googleSearchListFlag,
     required this.controller,
+    required this.focusNode,
   });
 
   final Function(String) search;
@@ -22,6 +23,7 @@ class SearchBarMap extends StatelessWidget {
   final VoidCallback back;
   final bool googleSearchListFlag;
   final TextEditingController controller;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class SearchBarMap extends StatelessWidget {
         width: double.infinity,
         child: Form(
           child: TextFormField(
+            focusNode: focusNode,
             controller: controller,
             onEditingComplete: onEditingComplete,
             onTap: onTap,
@@ -41,7 +44,7 @@ class SearchBarMap extends StatelessWidget {
             obscureText: false,
             decoration: InputDecoration(
               floatingLabelBehavior: FloatingLabelBehavior.never,
-              labelText: 'Search...',
+              labelText: 'Search Location ...',
               labelStyle: TextStyle(
                 fontFamily: fontTheme.fontFamily,
                 fontSize: 14,

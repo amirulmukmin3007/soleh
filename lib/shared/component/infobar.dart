@@ -67,15 +67,15 @@ class InfoBar extends StatelessWidget {
   }
 }
 
-class InfoBarClickable extends StatelessWidget {
+class InfoBarClickable extends StatefulWidget {
   const InfoBarClickable({
-    super.key,
+    Key? key,
     required this.textDisplay,
     required this.icon,
     required this.iconBackgroundColor,
     required this.iconColor,
     required this.function,
-  });
+  }) : super(key: key);
 
   final String textDisplay;
   final IconData icon;
@@ -84,49 +84,95 @@ class InfoBarClickable extends StatelessWidget {
   final VoidCallback function;
 
   @override
+  _InfoBarClickableState createState() => _InfoBarClickableState();
+}
+
+class _InfoBarClickableState extends State<InfoBarClickable> {
+  bool _isTapped = false;
+
+  @override
   Widget build(BuildContext context) {
     final FontTheme fontTheme = FontTheme();
+
     return GestureDetector(
-      onTap: function,
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
+      onTapDown: (_) {
+        setState(() {
+          _isTapped = true;
+        });
+      },
+      onTapUp: (_) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          setState(() {
+            _isTapped = false;
+          });
+          widget.function();
+        });
+      },
+      onTapCancel: () {
+        setState(() {
+          _isTapped = false;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        transform: Matrix4.identity()..scale(_isTapped ? 0.95 : 1.0),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color.fromARGB(255, 200, 200, 200),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.white70],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: _isTapped
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    offset: const Offset(0, 4),
+                    blurRadius: 8,
+                  ),
+                ],
         ),
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 35,
-                width: 35,
-                decoration: BoxDecoration(
-                  color: iconBackgroundColor,
-                  borderRadius: BorderRadius.circular(
-                    50,
+        child: Container(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 35,
+                  width: 35,
+                  decoration: BoxDecoration(
+                    color: widget.iconBackgroundColor,
+                    borderRadius: BorderRadius.circular(50),
                   ),
-                ),
-                child: Center(
-                  child: Icon(
-                    icon,
-                    color: iconColor,
-                    size: 20,
+                  child: Center(
+                    child: Icon(
+                      widget.icon,
+                      color: widget.iconColor,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Text(
-              textDisplay,
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: fontTheme.fontFamily,
-                fontWeight: FontWeight.w400,
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.8),
+                  child: Text(
+                    widget.textDisplay,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: fontTheme.fontFamily,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:soleh/model/home_model.dart';
+import 'package:soleh/model/map_model.dart';
+import 'package:soleh/provider/asma_ul_husna_provider.dart';
+import 'package:soleh/provider/location_provider.dart';
+import 'package:soleh/provider/time_provider.dart';
+import 'package:soleh/provider/waktu_solat_provider.dart';
 import 'package:soleh/shared/component/asmaulhusna_card.dart';
 import 'package:soleh/shared/component/home_header.dart';
 import 'package:soleh/shared/component/scaffoldbackground.dart';
@@ -11,67 +16,112 @@ import 'package:soleh/shared/component/waktusolat_card.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:location/location.dart';
 import 'package:soleh/themes/colors.dart';
-import 'package:soleh/view/masjid_location.dart';
 
 class Home extends StatefulWidget {
   static const routeName = "/home";
-  const Home({super.key});
+  const Home({super.key, required this.isActive});
+  final bool isActive;
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  HomeModel homeModel = HomeModel();
+  late HomeModel homeModel;
+  late TimeProvider timeProvider;
+  late LocationProvider locationProvider;
+  late WaktuSolatProvider waktuSolatProvider;
+  late AsmaUlHusnaProvider asmaUlHusnaProvider;
+  late MapModel mapModel;
   Formatter formatter = Formatter();
+  String currentWaktuSolat = '';
   Timer? timer;
 
   @override
   void initState() {
-    homeModel.getHijrahDate().then((value) => homeModel.setDate = value);
+    super.initState();
+    homeModel = HomeModel();
+    timeProvider = TimeProvider();
+    locationProvider = LocationProvider();
+    waktuSolatProvider = WaktuSolatProvider();
+    asmaUlHusnaProvider = AsmaUlHusnaProvider();
+    mapModel = MapModel();
+    homeModel
+        .getHijrahDate()
+        .then((value) => timeProvider.updateHijrahDate(value));
+    initialize();
     Timer.periodic(
       const Duration(seconds: 1),
       (timer) {
         setState(
           () {
-            homeModel.currentTime = formatter.getTime();
-            homeModel.currentMeridiem = formatter.getMeridiem();
+            callGetTime();
           },
         );
       },
     );
-    homeModel.currentLocation = getLiveLocation();
-    homeModel.getAsmaUlHusna();
-    print("Current latlng : ${homeModel.currentLat}, ${homeModel.currentLng}");
-    super.initState();
+    Timer.periodic(const Duration(minutes: 1), (timer) {
+      callGetLiveLocation();
+      callGetLocationName();
+      callGetCurrentWaktuSolat();
+    });
   }
 
-  String getLiveLocation() {
-    Location location = Location();
-    location.getLocation().then((location) {
-      homeModel.currentLat = location.latitude!;
-      homeModel.currentLng = location.longitude!;
-      var locationName =
-          homeModel.getLocationName(homeModel.currentLat, homeModel.currentLng);
-      homeModel.getWaktuSolatToday(homeModel.currentLat, homeModel.currentLng);
-      print(
-          "Current latlng : ${homeModel.currentLat}, ${homeModel.currentLng}");
+  void initialize() async {
+    await callGetTime();
+    await callGetWaktuSolatToday();
+    await callGetLiveLocation();
+    await callGetLocationName();
+    callGetCurrentWaktuSolat();
+    await callGetAsmaUlHusna();
+  }
 
-      return locationName;
-    });
-    return '';
+  Future<void> callGetTime() async {
+    timeProvider.updateCurrentTime(formatter.getTime());
+    timeProvider.updateCurrentMeridiem(formatter.getMeridiem());
+    setState(() {});
+  }
+
+  Future<void> callGetHijrahDate() async {
+    homeModel
+        .getHijrahDate()
+        .then((value) => timeProvider.updateHijrahDate(value));
+    setState(() {});
+  }
+
+  Future<void> callGetLiveLocation() async {
+    await homeModel.getLiveLocation(locationProvider);
+    setState(() {});
+  }
+
+  Future<void> callGetLocationName() async {
+    double lat = locationProvider.currentLatitude ?? mapModel.defaultLat;
+    double lng = locationProvider.currentLongitude ?? mapModel.defaultLng;
+    await homeModel.getLocationName(locationProvider, lat, lng);
+    setState(() {});
+  }
+
+  Future<void> callGetWaktuSolatToday() async {
+    double lat = locationProvider.currentLatitude ?? mapModel.defaultLat;
+    double lng = locationProvider.currentLongitude ?? mapModel.defaultLng;
+    await homeModel.getWaktuSolatToday(waktuSolatProvider, lat, lng);
+    setState(() {});
+  }
+
+  void callGetCurrentWaktuSolat() {
+    currentWaktuSolat = formatter.getCurrentWaktuSolat(
+        waktuSolatProvider.waktuSolatTime, waktuSolatProvider.waktuSolatLabel);
+    setState(() {});
+  }
+
+  Future<void> callGetAsmaUlHusna() async {
+    await homeModel.getAsmaUlHusna(asmaUlHusnaProvider);
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        setState(() {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const MasjidLocation();
-          }));
-        });
-      }),
       backgroundColor: Colors.transparent,
       body: ScaffoldBackground(
         child: SafeArea(
@@ -79,10 +129,10 @@ class _HomeState extends State<Home> {
             child: Column(
               children: [
                 HomeHeader(
-                  currentHijrahDate: homeModel.currentHijrahDate,
-                  currentTime: homeModel.currentTime,
-                  currentMeridiem: homeModel.currentMeridiem,
-                  currentLocation: homeModel.currentLocation,
+                  currentHijrahDate: timeProvider.hijrahDate,
+                  currentTime: timeProvider.currentTime,
+                  currentMeridiem: timeProvider.currentMeridiem,
+                  currentLocation: locationProvider.currentLocationName,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0, right: 20.0),
@@ -93,16 +143,19 @@ class _HomeState extends State<Home> {
                           const SizedBox(height: 10),
                           WaktuSolatCard(
                             today: homeModel.currentDay,
-                            subuh: homeModel.subuhTime,
-                            zohor: homeModel.zohorTime,
-                            asar: homeModel.asarTime,
-                            maghrib: homeModel.maghribTime,
-                            isyak: homeModel.isyakTime,
-                            homeModel: homeModel,
-                            formatter: formatter,
+                            currentWaktuSolat: currentWaktuSolat,
+                            subuh: waktuSolatProvider.subuh,
+                            syuruk: waktuSolatProvider.syuruk,
+                            zohor: waktuSolatProvider.zohor,
+                            asar: waktuSolatProvider.asar,
+                            maghrib: waktuSolatProvider.maghrib,
+                            isyak: waktuSolatProvider.isyak,
                           ),
                           const SizedBox(height: 10),
-                          AsmaUlHusnaCard(homeModel: homeModel),
+                          AsmaUlHusnaCard(
+                            asmaUlHusnaProvider: asmaUlHusnaProvider,
+                            homeModel: homeModel,
+                          ),
                           const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

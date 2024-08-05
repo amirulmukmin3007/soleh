@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:soleh/model/home_model.dart';
+import 'package:soleh/provider/waktu_solat_provider.dart';
 import 'package:soleh/shared/component/circlebutton.dart';
 import 'package:soleh/shared/component/shimmer.dart';
 import 'package:soleh/shared/functions/formatter.dart';
@@ -12,61 +12,31 @@ import 'package:soleh/themes/colors.dart';
 class WaktuSolatCard extends StatefulWidget {
   const WaktuSolatCard({
     super.key,
+    required this.currentWaktuSolat,
     required this.subuh,
+    required this.syuruk,
     required this.zohor,
     required this.asar,
     required this.maghrib,
     required this.isyak,
     required this.today,
-    required this.homeModel,
-    required this.formatter,
   });
+
+  final String currentWaktuSolat;
   final String subuh;
+  final String syuruk;
   final String zohor;
   final String asar;
   final String maghrib;
   final String isyak;
   final String today;
-  final HomeModel homeModel;
-  final Formatter formatter;
 
   @override
   State<WaktuSolatCard> createState() => _WaktuSolatState();
 }
 
 class _WaktuSolatState extends State<WaktuSolatCard> {
-  String currentWaktuSolat = '';
-
-  @override
-  void initState() {
-    Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        setState(
-          () {
-            widget.homeModel.waktuSolatToday = [
-              widget.subuh,
-              widget.zohor,
-              widget.asar,
-              widget.maghrib,
-              widget.isyak
-            ];
-            if (widget.homeModel.waktuSolatFlag &&
-                widget.subuh != '' &&
-                widget.zohor != '' &&
-                widget.asar != '' &&
-                widget.maghrib != '' &&
-                widget.isyak != '') {
-              currentWaktuSolat = widget.formatter.getCurrentWaktuSolat(
-                  widget.homeModel.waktuSolatToday,
-                  widget.homeModel.waktuSolatList);
-            }
-          },
-        );
-      },
-    );
-    super.initState();
-  }
+  List<String> waktuSolatList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -108,10 +78,10 @@ class _WaktuSolatState extends State<WaktuSolatCard> {
                 children: [
                   CircleButton(
                     iconData: FluentIcons.weather_sunny_low_24_regular,
-                    buttonColor: currentWaktuSolat == 'Subuh'
+                    buttonColor: widget.currentWaktuSolat == 'Subuh'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
-                    iconColor: currentWaktuSolat == 'Subuh'
+                    iconColor: widget.currentWaktuSolat == 'Subuh'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
                     waktuText: 'Subuh',
@@ -121,10 +91,10 @@ class _WaktuSolatState extends State<WaktuSolatCard> {
                   const SizedBox(width: 5),
                   CircleButton(
                     iconData: FluentIcons.weather_sunny_16_regular,
-                    buttonColor: currentWaktuSolat == 'Zohor'
+                    buttonColor: widget.currentWaktuSolat == 'Zohor'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
-                    iconColor: currentWaktuSolat == 'Zohor'
+                    iconColor: widget.currentWaktuSolat == 'Zohor'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
                     waktuText: 'Zohor',
@@ -134,10 +104,10 @@ class _WaktuSolatState extends State<WaktuSolatCard> {
                   const SizedBox(width: 5),
                   CircleButton(
                     iconData: FluentIcons.weather_sunny_high_48_regular,
-                    buttonColor: currentWaktuSolat == 'Asar'
+                    buttonColor: widget.currentWaktuSolat == 'Asar'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
-                    iconColor: currentWaktuSolat == 'Asar'
+                    iconColor: widget.currentWaktuSolat == 'Asar'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
                     waktuText: 'Asar',
@@ -148,10 +118,10 @@ class _WaktuSolatState extends State<WaktuSolatCard> {
                   CircleButton(
                     iconData:
                         FluentIcons.weather_partly_cloudy_night_24_regular,
-                    buttonColor: currentWaktuSolat == 'Maghrib'
+                    buttonColor: widget.currentWaktuSolat == 'Maghrib'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
-                    iconColor: currentWaktuSolat == 'Maghrib'
+                    iconColor: widget.currentWaktuSolat == 'Maghrib'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
                     waktuText: 'Maghrib',
@@ -161,10 +131,10 @@ class _WaktuSolatState extends State<WaktuSolatCard> {
                   const SizedBox(width: 5),
                   CircleButton(
                     iconData: FluentIcons.weather_moon_16_regular,
-                    buttonColor: currentWaktuSolat == 'Isyak'
+                    buttonColor: widget.currentWaktuSolat == 'Isyak'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
-                    iconColor: currentWaktuSolat == 'Isyak'
+                    iconColor: widget.currentWaktuSolat == 'Isyak'
                         ? Colors.amber[800]!
                         : ColorTheme.primary,
                     waktuText: 'Isyak',
