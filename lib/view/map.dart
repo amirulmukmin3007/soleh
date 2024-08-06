@@ -97,6 +97,7 @@ class _MosqueMapState extends State<MosqueMap> {
               children: [
                 TileLayer(
                   urlTemplate: mapModel.defaultMapTile,
+                  userAgentPackageName: 'com.example.app',
                 ),
                 MarkerClusterLayerWidget(
                   options: MarkerClusterLayerOptions(
