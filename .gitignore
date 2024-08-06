@@ -1,1 +1,6 @@
 .env
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+.idea
+.dart_tool
