@@ -31,34 +31,46 @@ class _AppNavBarState extends State<AppNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentPageIndex,
-        onTap: (index) {
-          setState(() {
-            currentPageIndex = index;
-            ifActive(index);
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(FluentIcons.home_24_filled),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(FluentIcons.compass_northwest_16_filled),
-            label: 'Qibla',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(FluentIcons.location_24_filled),
-            label: 'Map',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(FluentIcons.settings_16_filled),
-            label: 'Settings',
-          ),
-        ],
-        selectedItemColor: ColorTheme.primary,
-        unselectedItemColor: const Color.fromARGB(255, 154, 175, 156),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromARGB(255, 0, 0, 0),
+              spreadRadius: 0,
+              blurRadius: 0,
+              offset: Offset(0, 0),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: currentPageIndex,
+          onTap: (index) {
+            setState(() {
+              currentPageIndex = index;
+              ifActive(index);
+            });
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(FluentIcons.home_24_filled),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(FluentIcons.compass_northwest_16_filled),
+              label: 'Qibla',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(FluentIcons.location_24_filled),
+              label: 'Map',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(FluentIcons.settings_16_filled),
+              label: 'Settings',
+            ),
+          ],
+          selectedItemColor: ColorTheme.primary,
+          unselectedItemColor: const Color.fromARGB(255, 154, 175, 156),
+        ),
       ),
       body: IndexedStack(index: currentPageIndex, children: [
         Home(isActive: pageFlags[0]),
