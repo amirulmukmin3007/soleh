@@ -1,6 +1,13 @@
 # soleh
 Islamic Mobile Application that has many features rolled into one.
 
+## Screenshot
+![Screenshot_1724296953](https://github.com/user-attachments/assets/6d727e70-0cac-4439-812e-d1934a487792)
+![Screenshot_1724296964](https://github.com/user-attachments/assets/b3b5b5b6-376e-48d8-9e17-dd352aafd438)
+![Screenshot_1724296967](https://github.com/user-attachments/assets/becef4e3-8349-4a18-a26f-37ebdf701bc7)
+![Screenshot_1724296972](https://github.com/user-attachments/assets/0c7ff740-98da-45bf-b351-e60bf05753c1)
+![Screenshot_1724296974](https://github.com/user-attachments/assets/331fd5b0-fda4-4ecb-9603-588cc63b24d9)
+
 Integration with:
 - [My Prayer Times] https://mpt.i906.my/api.html
 - [JAKIM] https://gist.github.com/lomotech/b25cde7118adf5e7a1fea4ce6cfce259
