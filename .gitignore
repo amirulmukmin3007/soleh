@@ -5,3 +5,4 @@
 .idea
 .dart_tool
 /build
+build/
