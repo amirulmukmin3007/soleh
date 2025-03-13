@@ -142,6 +142,7 @@ class _DraggableSheetState extends State<DraggableSheet> {
                   delegate: _StickyTabBarDelegate(
                     TabBar(
                       indicatorColor: ColorTheme.primary,
+                      indicatorSize: TabBarIndicatorSize.tab,
                       labelColor: ColorTheme.primary,
                       labelStyle: TextStyle(
                         fontFamily: FontTheme().fontFamily,

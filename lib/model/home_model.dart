@@ -32,49 +32,47 @@ class HomeModel {
   String isyakTime = '';
   // bool waktuSolatFlag = false;
 
-  Future<void> getLiveLocation(LocationProvider locationProvider) async {
+  Future<LocationData> getLiveLocation(
+      LocationProvider locationProvider) async {
     Location location = Location();
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
 
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
+    serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
         print('Location service is disabled.');
-        return;
+        return LocationData.fromMap({});
       }
     }
 
-    // Check for location permission
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        // Handle permission denied
+    permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
         print('Location permission denied.');
-        return;
+        return LocationData.fromMap({});
       }
     }
 
     try {
-      var locData = await location.getLocation();
+      LocationData locData = await location.getLocation();
 
-      if (locationProvider.currentLatitude.toString() ==
-              locData.latitude.toString() &&
-          locationProvider.currentLongitude.toString() ==
-              locData.longitude.toString()) {
-      } else {
-        locationProvider.updateLocation(locData, locData.latitude?.toDouble(),
-            locData.longitude?.toDouble());
+      if (locData.latitude != null && locData.longitude != null) {
+        if (locationProvider.currentLatitude == locData.latitude &&
+            locationProvider.currentLongitude == locData.longitude) {
+          return locData;
+        } else {
+          locationProvider.updateLocation(locData, locData.latitude!.toDouble(),
+              locData.longitude!.toDouble());
+          return locData;
+        }
       }
-      print(locationProvider.currentLatitude.toString() +
-          ', ' +
-          locationProvider.currentLongitude.toString());
     } catch (e) {
-      // Handle any other exceptions
       print('Error getting location: $e');
     }
+    return LocationData.fromMap({});
   }
 
   // Get Hijrah Date
@@ -235,7 +233,6 @@ class HomeModel {
         Uri.parse('$aladhan$asmaUlHusnaSearch$randomNumber'),
       );
       var data = jsonDecode(response.body);
-      print(data);
       auhMeaning = data['data'][0]['en']['meaning'];
       auhAR = data['data'][0]['name'];
       auhEN = data['data'][0]['transliteration'];

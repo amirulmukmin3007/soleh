@@ -44,7 +44,7 @@ class SearchBarMap extends StatelessWidget {
             obscureText: false,
             decoration: InputDecoration(
               floatingLabelBehavior: FloatingLabelBehavior.never,
-              labelText: 'Search Location ...',
+              labelText: 'Search via Google Maps . . .',
               labelStyle: TextStyle(
                 fontFamily: fontTheme.fontFamily,
                 fontSize: 14,

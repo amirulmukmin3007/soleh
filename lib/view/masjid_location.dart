@@ -471,7 +471,7 @@
 //                           ),
 //                           CurrentLocationLayer(
 //                             style: const LocationMarkerStyle(
-                              // marker: DefaultLocationMarker(),
+//                               marker: DefaultLocationMarker(),
 //                               markerSize: Size(20, 20),
 //                             ),
 //                           ),

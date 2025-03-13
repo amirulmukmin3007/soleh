@@ -1,6 +1,7 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 import 'package:soleh/themes/colors.dart';
@@ -30,54 +31,62 @@ class _AppNavBarState extends State<AppNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromARGB(255, 0, 0, 0),
-              spreadRadius: 0,
-              blurRadius: 0,
-              offset: Offset(0, 0),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: currentPageIndex,
-          onTap: (index) {
-            setState(() {
-              currentPageIndex = index;
-              ifActive(index);
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(FluentIcons.home_24_filled),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(FluentIcons.compass_northwest_16_filled),
-              label: 'Qibla',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(FluentIcons.location_24_filled),
-              label: 'Map',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(FluentIcons.settings_16_filled),
-              label: 'Settings',
-            ),
-          ],
-          selectedItemColor: ColorTheme.primary,
-          unselectedItemColor: const Color.fromARGB(255, 154, 175, 156),
-        ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor:
+            ColorTheme.primary, // Set status bar color to match the theme
+        statusBarIconBrightness:
+            Brightness.light, // Change icons to light for better contrast
       ),
-      body: IndexedStack(index: currentPageIndex, children: [
-        Home(isActive: pageFlags[0]),
-        Qibla(isActive: pageFlags[1]),
-        MosqueMap(isActive: pageFlags[2]),
-        Settings(isActive: pageFlags[3]),
-      ]),
+      child: Scaffold(
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(255, 0, 0, 0),
+                spreadRadius: 0,
+                blurRadius: 0,
+                offset: Offset(0, 0),
+              ),
+            ],
+          ),
+          child: BottomNavigationBar(
+            currentIndex: currentPageIndex,
+            onTap: (index) {
+              setState(() {
+                currentPageIndex = index;
+                ifActive(index);
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(FluentIcons.home_24_filled),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(FluentIcons.compass_northwest_16_filled),
+                label: 'Qibla',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(FluentIcons.location_24_filled),
+                label: 'Map',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(FluentIcons.settings_16_filled),
+                label: 'Settings',
+              ),
+            ],
+            selectedItemColor: ColorTheme.primary,
+            unselectedItemColor: const Color.fromARGB(255, 154, 175, 156),
+          ),
+        ),
+        body: IndexedStack(index: currentPageIndex, children: [
+          Home(isActive: pageFlags[0]),
+          Qibla(isActive: pageFlags[1]),
+          MosqueMap(isActive: pageFlags[2]),
+          Settings(isActive: pageFlags[3]),
+        ]),
+      ),
     );
   }
 }

@@ -39,7 +39,14 @@ class InfoBar extends StatelessWidget {
               height: 35,
               width: 35,
               decoration: BoxDecoration(
-                color: iconBackgroundColor,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    iconBackgroundColor,
+                    iconBackgroundColor.withOpacity(0.1),
+                  ],
+                ),
                 borderRadius: BorderRadius.circular(
                   50,
                 ),

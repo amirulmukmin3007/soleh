@@ -1,9 +1,13 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:location/location.dart';
 import 'package:soleh/model/map_model.dart';
 import 'package:soleh/model/home_model.dart';
 import 'package:soleh/provider/location_provider.dart';
@@ -39,6 +43,8 @@ class _MosqueMapState extends State<MosqueMap> {
   TextEditingController searchBarMapController = TextEditingController();
   bool searchBarMapFlag = false;
   bool mosqueMarkerFlag = false;
+  MapController mapController = MapController();
+  LocationData pinMyLocation = LocationData.fromMap({});
 
   // Draggable Sheet
   String placeDraggableSheet = '';
@@ -62,16 +68,7 @@ class _MosqueMapState extends State<MosqueMap> {
     leafletFunction = LeafletFunction();
     formatter = Formatter();
     callGetMosqueMarker();
-  }
-
-  Future<void> callGetMosqueMarker() async {
-    await mapModel.getMosqueMarker(mosqueMarkerProvider);
-    setState(() {});
-  }
-
-  Future<void> callGetLiveLocation() async {
-    await homeModel.getLiveLocation(locationProvider);
-    setState(() {});
+    callGetLiveLocation();
   }
 
   @override
@@ -85,7 +82,11 @@ class _MosqueMapState extends State<MosqueMap> {
         child: Stack(
           children: [
             FlutterMap(
+              mapController: mapController,
               options: MapOptions(
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+                ),
                 initialZoom: 7,
                 initialCenter: mapModel.defaultLatLng,
                 onTap: (tapPosition, point) {
@@ -98,6 +99,12 @@ class _MosqueMapState extends State<MosqueMap> {
                 TileLayer(
                   urlTemplate: mapModel.defaultMapTile,
                   userAgentPackageName: 'com.example.app',
+                ),
+                CurrentLocationLayer(
+                  style: const LocationMarkerStyle(
+                    marker: DefaultLocationMarker(),
+                    markerSize: Size(20, 20),
+                  ),
                 ),
                 MarkerClusterLayerWidget(
                   options: MarkerClusterLayerOptions(
@@ -124,6 +131,19 @@ class _MosqueMapState extends State<MosqueMap> {
                   markers: mapModel.onTapMarkerPinList,
                 ),
               ],
+            ),
+            DraggableSheet(
+              sheetController: mapModel.dragController,
+              place: placeDraggableSheet,
+              address: addressDraggableSheet,
+              mosqueFlag: mosqueMarkerFlag,
+              state: stateDraggableSheet,
+              poskod: poskodDraggableSheet,
+              lat: latitudeDraggableSheet,
+              long: longitudeDraggableSheet,
+              distance: distanceDraggableSheet,
+              currentLat: currentLatDraggableSheet,
+              currentLong: currentLngDraggableSheet,
             ),
             Visibility(
               visible: searchBarMapFlag,
@@ -206,43 +226,18 @@ class _MosqueMapState extends State<MosqueMap> {
                                 press: (value) async {
                                   setState(() {
                                     // Filtering Location Name
+                                    clearDraggableSheet();
+
                                     List<String> arrayLocationName = formatter
                                         .splitAddressAtFirstComma(value);
-                                    mapModel.dragLocationNameLarge =
-                                        arrayLocationName[0];
+                                    placeDraggableSheet = arrayLocationName[0];
 
-                                    mapModel.dragLocationNameSmall =
+                                    addressDraggableSheet =
                                         arrayLocationName[1];
-                                    // -----------------------------------------------
 
-                                    //   mapModel.poiFlag = leafletMapController
-                                    //       .setFlagFalsePOIDraggableSheet(
-                                    //           mapModel.poiFlag);
-
-                                    //   mapModel.dragServiceType =
-                                    //       leafletMapController
-                                    //           .setDraggableSheetServiceType('');
-                                    //   mapModel.dragBusinessHours =
-                                    //       leafletMapController
-                                    //           .setDraggableSheetBusinessHour('');
-                                    //   mapModel.dragCategory = leafletMapController
-                                    //       .setDraggableSheetCategory('');
-                                    //   mapModel.dragLat =
-                                    //       leafletMapController.setLatSBGM('');
-                                    //   mapModel.dragLong =
-                                    //       leafletMapController.setLatSBGM('');
-
-                                    //   searchControllerGoogle.text = value;
-                                    //   mapModel.googleSearchListFlag =
-                                    //       leafletMapController.setFlagFalseSBGM(
-                                    //           mapModel.googleSearchListFlag);
-                                    //   FocusScope.of(context).unfocus();
+                                    searchBarMapFlag = false;
+                                    focusNode.unfocus();
                                   });
-                                  // var place = await mapModel.getPlace(value);
-                                  // var pointLatLng =
-                                  //     await mapModel.pointToPlace(place);
-                                  // mapModel.moveCameraToLocation(pointLatLng);
-                                  // mapModel.expandDraggableSheet();
                                 },
                               );
                             },
@@ -302,19 +297,58 @@ class _MosqueMapState extends State<MosqueMap> {
                 ],
               ),
             ),
-            DraggableSheet(
-              sheetController: mapModel.dragController,
-              place: placeDraggableSheet,
-              address: addressDraggableSheet,
-              mosqueFlag: mosqueMarkerFlag,
-              state: stateDraggableSheet,
-              poskod: poskodDraggableSheet,
-              lat: latitudeDraggableSheet,
-              long: longitudeDraggableSheet,
-              distance: distanceDraggableSheet,
-              currentLat: currentLatDraggableSheet,
-              currentLong: currentLngDraggableSheet,
-            ),
+            Positioned(
+              bottom: 20,
+              right: 10,
+              child: SpeedDial(
+                icon: FluentIcons.map_20_regular,
+                iconTheme: const IconThemeData(color: Colors.white),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    ColorTheme.primary,
+                    ColorTheme.primary.withOpacity(0.75),
+                  ],
+                ),
+                gradientBoxShape: BoxShape.circle,
+                visible: true,
+                curve: Curves.bounceIn,
+                overlayColor: Colors.black,
+                overlayOpacity: 0.5,
+                children: [
+                  SpeedDialChild(
+                    label: 'My Location',
+                    labelBackgroundColor: ColorTheme.primary,
+                    labelStyle: TextStyle(
+                      color: Colors.white,
+                      fontFamily: FontTheme().fontFamily,
+                    ),
+                    shape: const CircleBorder(),
+                    child: const Icon(FluentIcons.my_location_20_filled),
+                    onTap: () {
+                      setState(() {
+                        mapModel.goToMyLocation(context, mapController,
+                            pinMyLocation.latitude, pinMyLocation.longitude);
+                      });
+                    },
+                  ),
+                  SpeedDialChild(
+                    label: 'Malaysia View',
+                    labelBackgroundColor: ColorTheme.primary,
+                    labelStyle: TextStyle(
+                      color: Colors.white,
+                      fontFamily: FontTheme().fontFamily,
+                    ),
+                    shape: const CircleBorder(),
+                    child: const Icon(FluentIcons.globe_20_filled),
+                    onTap: () {
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -322,11 +356,21 @@ class _MosqueMapState extends State<MosqueMap> {
   }
 
   // Functions
+  Future<void> callGetMosqueMarker() async {
+    await mapModel.getMosqueMarker(mosqueMarkerProvider);
+    setState(() {});
+  }
+
+  Future<void> callGetLiveLocation() async {
+    pinMyLocation = await homeModel.getLiveLocation(locationProvider);
+    setState(() {});
+  }
+
   void onMarkerTapDraggableSheet(Marker marker) {
+    clearDraggableSheet();
     String key = (marker.key as ValueKey<String>).value;
     String refid = key.replaceAll(RegExp(r"[<>'\[\]]"), '');
     Map<String, dynamic> result = {};
-    print(refid);
 
     mosqueMarkerProvider.markersInfo.forEach((element) {
       if (element['refid'] == int.parse(refid)) {
@@ -356,5 +400,17 @@ class _MosqueMapState extends State<MosqueMap> {
       distanceDraggableSheet =
           mapModel.calculateDistance(lat1, lon1, lat2, lon2);
     }
+  }
+
+  void clearDraggableSheet() {
+    mosqueMarkerFlag = false;
+    placeDraggableSheet = '';
+    addressDraggableSheet = '';
+    stateDraggableSheet = '';
+    poskodDraggableSheet = '';
+    noTelDraggableSheet = '';
+    latitudeDraggableSheet = '';
+    longitudeDraggableSheet = '';
+    distanceDraggableSheet = '';
   }
 }

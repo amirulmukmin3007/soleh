@@ -11,9 +11,11 @@ import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math' show cos, sqrt, asin;
 import 'package:intl/intl.dart';
+import 'package:soleh/shared/component/dialogs.dart';
+import 'package:soleh/shared/component/draggablebottomsheet.dart';
 
 class MapModel {
-  LatLng defaultLatLng = const LatLng(3.1421764850803244, 101.69171438465744);
+  LatLng defaultLatLng = const LatLng(3.14, 101.69);
   double defaultLat = 3.1421764850803244;
   double defaultLng = 101.69171438465744;
   String defaultMapTile =
@@ -37,14 +39,23 @@ class MapModel {
   List<Map<String, dynamic>> markerListInfo = [];
   bool markerListFlag = false;
 
-  // Draggable Sheet
-  late String dragLocationNameLarge = '';
-  late String dragLocationNameSmall = '';
-  late String dragDistrict = '';
-  late String dragNoTel = '';
-  late String dragLat = '';
-  late String dragLong = '';
-  late String dragDistance = '';
+  void goToMyLocation(context, mapController, double? myLat, double? myLong) {
+    if (myLat == null || myLong == null) {
+      CustomDialog.show(context,
+          title: 'Location Unavailable',
+          description: 'Please enable location service',
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ]);
+    } else {
+      mapController.move(LatLng(myLat, myLong), 15.0);
+    }
+  }
 
   void onTapMarker(LatLng point) {
     onTapMarkerPinList.remove(onTapMarkerPin);
@@ -141,6 +152,7 @@ class MapModel {
 
     String? response = await fetchUrl(uri);
     placeList = jsonDecode(response!);
+    print(placeList);
 
     Map<String, dynamic> jsonData = jsonDecode(response);
 
@@ -153,7 +165,7 @@ class MapModel {
           String description = prediction["description"];
           descriptionList.add(description);
           if (kDebugMode) {
-            // print(descriptionList);
+            print(descriptionList);
           }
         }
       }
