@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:soleh/provider/asma_ul_husna_provider.dart';
 import 'package:soleh/provider/location_provider.dart';
 import 'package:soleh/provider/mosque_marker_provider.dart';
 import 'package:soleh/provider/time_provider.dart';
 import 'package:soleh/provider/waktu_solat_provider.dart';
+import 'package:soleh/themes/fonts.dart';
 import 'package:soleh/view/bottomnavigationbar.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -30,7 +33,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      theme: ThemeData(fontFamily: FontTheme().fontFamily),
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       home: AppNavBar(),

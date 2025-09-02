@@ -20,6 +20,8 @@ class MapModel {
   double defaultLng = 101.69171438465744;
   String defaultMapTile =
       "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&key=$googleMapKey";
+  String defaultMapTile2 =
+      "https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=oJo1lsj89BZ6R7OTxTm1";
 
   // On Tap State Management
   late Marker onTapMarkerPin =
@@ -72,7 +74,7 @@ class MapModel {
 
   void expandDraggableSheet() {
     dragController.animateTo(
-      0.2,
+      0.4,
       duration: const Duration(milliseconds: 700),
       curve: Curves.easeOutBack,
     );
@@ -145,6 +147,9 @@ class MapModel {
   }
 
   Future<List<dynamic>> placeAutoCompleteSearch(String input) async {
+    if (input.isEmpty) {
+      return [];
+    }
     Uri uri = Uri.https(googleMapsUrl, googlePlaceAutoCompleteApi, {
       "input": input,
       "key": placeKey,

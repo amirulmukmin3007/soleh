@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:soleh/model/home_model.dart';
 import 'package:soleh/model/map_model.dart';
 import 'package:soleh/provider/asma_ul_husna_provider.dart';
@@ -26,16 +27,27 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with TickerProviderStateMixin {
   late HomeModel homeModel;
   late TimeProvider timeProvider;
   late LocationProvider locationProvider;
   late WaktuSolatProvider waktuSolatProvider;
   late AsmaUlHusnaProvider asmaUlHusnaProvider;
   late MapModel mapModel;
+  late AnimationController _fadeAnimationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
   Formatter formatter = Formatter();
   String currentWaktuSolat = '';
   Timer? timer;
+  Timer? minuteTimer;
+
+  // Loading states
+  bool isLocationLoading = true;
+  bool isWaktuSolatLoading = true;
+  bool isAsmaUlHusnaLoading = true;
+  bool isInitializing = true;
 
   @override
   void initState() {
@@ -46,21 +58,44 @@ class _HomeState extends State<Home> {
     waktuSolatProvider = WaktuSolatProvider();
     asmaUlHusnaProvider = AsmaUlHusnaProvider();
     mapModel = MapModel();
+
+    // Initialize animation controller
+    _fadeAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeAnimationController,
+      curve: const Interval(0.0, 1.0, curve: Curves.easeOut),
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _fadeAnimationController,
+      curve: const Interval(0.0, 1.0, curve: Curves.easeOut),
+    ));
+
     homeModel
         .getHijrahDate()
         .then((value) => timeProvider.updateHijrahDate(value));
     initialize();
-    Timer.periodic(
+
+    timer = Timer.periodic(
       const Duration(seconds: 1),
       (timer) {
-        setState(
-          () {
-            callGetTime();
-          },
-        );
+        setState(() {
+          callGetTime();
+        });
       },
     );
-    Timer.periodic(const Duration(minutes: 1), (timer) {
+
+    minuteTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
       callGetLiveLocation();
       callGetLocationName();
       callGetCurrentWaktuSolat();
@@ -74,6 +109,12 @@ class _HomeState extends State<Home> {
     await callGetLocationName();
     callGetCurrentWaktuSolat();
     await callGetAsmaUlHusna();
+
+    // Start the fade-up animation after initialization
+    setState(() {
+      isInitializing = false;
+    });
+    _fadeAnimationController.forward();
   }
 
   Future<void> callGetTime() async {
@@ -90,8 +131,13 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> callGetLiveLocation() async {
+    setState(() {
+      isLocationLoading = true;
+    });
     await homeModel.getLiveLocation(locationProvider);
-    setState(() {});
+    setState(() {
+      isLocationLoading = false;
+    });
   }
 
   Future<void> callGetLocationName() async {
@@ -102,10 +148,15 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> callGetWaktuSolatToday() async {
+    setState(() {
+      isWaktuSolatLoading = true;
+    });
     double lat = locationProvider.currentLatitude ?? mapModel.defaultLat;
     double lng = locationProvider.currentLongitude ?? mapModel.defaultLng;
     await homeModel.getWaktuSolatToday(waktuSolatProvider, lat, lng);
-    setState(() {});
+    setState(() {
+      isWaktuSolatLoading = false;
+    });
   }
 
   void callGetCurrentWaktuSolat() {
@@ -115,8 +166,83 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> callGetAsmaUlHusna() async {
+    setState(() {
+      isAsmaUlHusnaLoading = true;
+    });
     await homeModel.getAsmaUlHusna(asmaUlHusnaProvider);
-    setState(() {});
+    setState(() {
+      isAsmaUlHusnaLoading = false;
+    });
+  }
+
+  Widget _buildWaktuSolatCardShimmer() {
+    return Container(
+      height: 200, // Adjust based on your card height
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white.withOpacity(0.1),
+      ),
+      child: Shimmer(
+        gradient: const LinearGradient(
+          colors: [Colors.white, Colors.white70],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white.withOpacity(0.3),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAsmaUlHusnaCardShimmer() {
+    return Container(
+      height: 120, // Adjust based on your card height
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white.withOpacity(0.1),
+      ),
+      child: Shimmer(
+        gradient: const LinearGradient(
+          colors: [Colors.white, Colors.white70],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white.withOpacity(0.3),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnimatedCard({required Widget child, required int index}) {
+    return AnimatedBuilder(
+      animation: _fadeAnimationController,
+      builder: (context, child) {
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    minuteTimer?.cancel();
+    _fadeAnimationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -128,12 +254,31 @@ class _HomeState extends State<Home> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                HomeHeader(
-                  currentHijrahDate: timeProvider.hijrahDate,
-                  currentTime: timeProvider.currentTime,
-                  currentMeridiem: timeProvider.currentMeridiem,
-                  currentLocation: locationProvider.currentLocationName,
-                ),
+                // Header with shimmer for location if loading
+                isLocationLoading
+                    ? Container(
+                        padding: const EdgeInsets.all(20),
+                        child: Shimmer(
+                          gradient: const LinearGradient(
+                            colors: [Colors.white, Colors.white70],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          child: Container(
+                            height: 60,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
+                        ),
+                      )
+                    : HomeHeader(
+                        currentHijrahDate: timeProvider.hijrahDate,
+                        currentTime: timeProvider.currentTime,
+                        currentMeridiem: timeProvider.currentMeridiem,
+                        currentLocation: locationProvider.currentLocationName,
+                      ),
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                   child: Column(
@@ -141,209 +286,34 @@ class _HomeState extends State<Home> {
                       Column(
                         children: [
                           const SizedBox(height: 10),
-                          WaktuSolatCard(
-                            today: homeModel.currentDay,
-                            currentWaktuSolat: currentWaktuSolat,
-                            subuh: waktuSolatProvider.subuh,
-                            syuruk: waktuSolatProvider.syuruk,
-                            zohor: waktuSolatProvider.zohor,
-                            asar: waktuSolatProvider.asar,
-                            maghrib: waktuSolatProvider.maghrib,
-                            isyak: waktuSolatProvider.isyak,
-                          ),
+                          // Waktu Solat Card with shimmer and animation
+                          isWaktuSolatLoading || isInitializing
+                              ? _buildWaktuSolatCardShimmer()
+                              : _buildAnimatedCard(
+                                  index: 0,
+                                  child: WaktuSolatCard(
+                                    today: homeModel.currentDay,
+                                    currentWaktuSolat: currentWaktuSolat,
+                                    subuh: waktuSolatProvider.subuh,
+                                    syuruk: waktuSolatProvider.syuruk,
+                                    zohor: waktuSolatProvider.zohor,
+                                    asar: waktuSolatProvider.asar,
+                                    maghrib: waktuSolatProvider.maghrib,
+                                    isyak: waktuSolatProvider.isyak,
+                                  ),
+                                ),
                           const SizedBox(height: 10),
-                          AsmaUlHusnaCard(
-                            asmaUlHusnaProvider: asmaUlHusnaProvider,
-                            homeModel: homeModel,
-                          ),
+                          // Asma Ul Husna Card with shimmer and animation
+                          isAsmaUlHusnaLoading || isInitializing
+                              ? _buildAsmaUlHusnaCardShimmer()
+                              : _buildAnimatedCard(
+                                  index: 1,
+                                  child: AsmaUlHusnaCard(
+                                    asmaUlHusnaProvider: asmaUlHusnaProvider,
+                                    homeModel: homeModel,
+                                  ),
+                                ),
                           const SizedBox(height: 10),
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //   children: [
-                          //     Expanded(
-                          //       child: Card(
-                          //         shape: RoundedRectangleBorder(
-                          //           borderRadius: BorderRadius.circular(20),
-                          //         ),
-                          //         elevation: 8.0,
-                          //         child: Container(
-                          //           width: 160,
-                          //           height: 160,
-                          //           decoration: BoxDecoration(
-                          //             borderRadius: BorderRadius.circular(20),
-                          //             color: const Color(0xFF7DC8E0),
-                          //           ),
-                          //           child: Stack(
-                          //             children: [
-                          //               Padding(
-                          //                 padding: const EdgeInsets.all(8.0),
-                          //                 child: Image.asset(
-                          //                   "assets/images/quran.png",
-                          //                   fit: BoxFit.cover,
-                          //                   opacity:
-                          //                       const AlwaysStoppedAnimation(
-                          //                           0.5),
-                          //                 ),
-                          //               ),
-                          //               Center(
-                          //                 child: Column(
-                          //                   children: [
-                          //                     Text(
-                          //                       "NUZUL QURAN",
-                          //                       style: TextStyle(
-                          //                         fontFamily:
-                          //                             GoogleFonts.staatliches()
-                          //                                 .fontFamily,
-                          //                         fontSize: 30,
-                          //                         fontWeight: FontWeight.bold,
-                          //                         color: Colors.white,
-                          //                         shadows: const [
-                          //                           Shadow(
-                          //                             color: Colors.black,
-                          //                             offset: Offset(1, 1),
-                          //                             blurRadius: 5.0,
-                          //                           )
-                          //                         ],
-                          //                       ),
-                          //                     ),
-                          //                     Text(
-                          //                       "144",
-                          //                       style: TextStyle(
-                          //                         fontFamily:
-                          //                             GoogleFonts.staatliches()
-                          //                                 .fontFamily,
-                          //                         fontSize: 60,
-                          //                         fontWeight: FontWeight.bold,
-                          //                         color: Colors.white,
-                          //                         shadows: const [
-                          //                           Shadow(
-                          //                             color: Colors.black,
-                          //                             offset: Offset(1, 1),
-                          //                             blurRadius: 5.0,
-                          //                           )
-                          //                         ],
-                          //                       ),
-                          //                     ),
-                          //                     Text(
-                          //                       "days",
-                          //                       style: TextStyle(
-                          //                         fontFamily:
-                          //                             GoogleFonts.montserrat()
-                          //                                 .fontFamily,
-                          //                         fontSize: 18,
-                          //                         fontWeight: FontWeight.bold,
-                          //                         color: Colors.white,
-                          //                         shadows: const [
-                          //                           Shadow(
-                          //                             color: Colors.black,
-                          //                             offset: Offset(1, 1),
-                          //                             blurRadius: 5.0,
-                          //                           )
-                          //                         ],
-                          //                       ),
-                          //                     ),
-                          //                   ],
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //     Expanded(
-                          //       child: Card(
-                          //         shape: RoundedRectangleBorder(
-                          //           borderRadius: BorderRadius.circular(20),
-                          //         ),
-                          //         elevation: 8.0,
-                          //         child: Container(
-                          //           width: 160,
-                          //           height: 160,
-                          //           decoration: BoxDecoration(
-                          //             borderRadius: BorderRadius.circular(20),
-                          //             color: const Color.fromARGB(
-                          //                 255, 232, 241, 167),
-                          //           ),
-                          //           child: Stack(
-                          //             children: [
-                          //               Padding(
-                          //                 padding: const EdgeInsets.all(8.0),
-                          //                 child: Image.asset(
-                          //                   "assets/images/ketupat.png",
-                          //                   fit: BoxFit.cover,
-                          //                   opacity:
-                          //                       const AlwaysStoppedAnimation(
-                          //                           0.5),
-                          //                 ),
-                          //               ),
-                          //               Center(
-                          //                 child: Column(
-                          //                   children: [
-                          //                     Text(
-                          //                       "EID FITR",
-                          //                       style: TextStyle(
-                          //                         fontFamily:
-                          //                             GoogleFonts.staatliches()
-                          //                                 .fontFamily,
-                          //                         fontSize: 30,
-                          //                         fontWeight: FontWeight.bold,
-                          //                         color: Colors.white,
-                          //                         shadows: const [
-                          //                           Shadow(
-                          //                             color: Colors.black,
-                          //                             offset: Offset(1, 1),
-                          //                             blurRadius: 5.0,
-                          //                           )
-                          //                         ],
-                          //                       ),
-                          //                     ),
-                          //                     Text(
-                          //                       "5",
-                          //                       style: TextStyle(
-                          //                         fontFamily:
-                          //                             GoogleFonts.staatliches()
-                          //                                 .fontFamily,
-                          //                         fontSize: 60,
-                          //                         fontWeight: FontWeight.bold,
-                          //                         color: Colors.white,
-                          //                         shadows: const [
-                          //                           Shadow(
-                          //                             color: Colors.black,
-                          //                             offset: Offset(1, 1),
-                          //                             blurRadius: 5.0,
-                          //                           )
-                          //                         ],
-                          //                       ),
-                          //                     ),
-                          //                     Text(
-                          //                       "days",
-                          //                       style: TextStyle(
-                          //                         fontFamily:
-                          //                             GoogleFonts.montserrat()
-                          //                                 .fontFamily,
-                          //                         fontSize: 18,
-                          //                         fontWeight: FontWeight.bold,
-                          //                         color: Colors.white,
-                          //                         shadows: const [
-                          //                           Shadow(
-                          //                             color: Colors.black,
-                          //                             offset: Offset(1, 1),
-                          //                             blurRadius: 5.0,
-                          //                           )
-                          //                         ],
-                          //                       ),
-                          //                     ),
-                          //                   ],
-                          //                 ),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     )
-                          //   ],
-                          // ),
-                          const SizedBox(height: 30),
                         ],
                       ),
                       const SizedBox(height: 100)

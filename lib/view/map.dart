@@ -1,4 +1,5 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -122,7 +123,11 @@ class _MosqueMapState extends State<MosqueMap> {
                     onMarkerTap: (marker) {
                       setState(() {
                         onMarkerTapDraggableSheet(marker);
-                        mapModel.expandDraggableSheet();
+                      });
+
+                      // Wait for the widget to rebuild before expanding sheet
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _expandDraggableSheet();
                       });
                     },
                   ),
@@ -152,101 +157,73 @@ class _MosqueMapState extends State<MosqueMap> {
                 width: double.infinity,
                 height: double.infinity,
                 child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 100.0),
-                    child: FutureBuilder<List<dynamic>>(
-                      future: mapModel
-                          .placeAutoCompleteSearch(searchBarMapController.text),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Align(
-                              alignment: Alignment.center,
-                              child: CircularProgressIndicator(
-                                  color: ColorTheme.primary));
-                        } else if (snapshot.hasError) {
-                          return SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const SizedBox(
-                                  height: 300,
-                                  width: 300,
-                                  child: Image(
-                                    image: AssetImage(
-                                      'assets/images/no-internet.png',
-                                    ),
-                                  ),
-                                ),
-                                Center(
-                                  child: Text(
-                                    'No internet connection.',
-                                    style: TextStyle(
-                                      fontFamily: FontTheme().fontFamily,
-                                      fontSize: 24,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                              ],
+                  child: Column(
+                    children: [
+                      // Search Header with improved spacing
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
-                          );
-                        } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                          return SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const SizedBox(
-                                  height: 300,
-                                  width: 300,
-                                  child: Image(
-                                    image: AssetImage(
-                                        'assets/images/travel-location.png'),
-                                  ),
-                                ),
-                                Center(
-                                  child: Text(
-                                    'No results found.',
-                                    style: TextStyle(
-                                      fontFamily: FontTheme().fontFamily,
-                                      fontSize: 24,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                              ],
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  searchBarMapFlag = false;
+                                  focusNode.unfocus();
+                                });
+                              },
+                              icon: const Icon(Icons.arrow_back_ios, size: 20),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
                             ),
-                          );
-                        } else if (snapshot.hasData) {
-                          List<dynamic>? data = snapshot.data;
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
-                            itemCount: data!.length,
-                            itemBuilder: (context, index) {
-                              return LocationListTile(
-                                location: data[index],
-                                press: (value) async {
-                                  setState(() {
-                                    // Filtering Location Name
-                                    clearDraggableSheet();
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Search Places',
+                                style: TextStyle(
+                                  fontFamily: FontTheme().fontFamily,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
-                                    List<String> arrayLocationName = formatter
-                                        .splitAddressAtFirstComma(value);
-                                    placeDraggableSheet = arrayLocationName[0];
-
-                                    addressDraggableSheet =
-                                        arrayLocationName[1];
-
-                                    searchBarMapFlag = false;
-                                    focusNode.unfocus();
-                                  });
-                                },
-                              );
-                            },
-                          );
-                        } else {
-                          return const Text('Tiada data.');
-                        }
-                      },
-                    ),
+                      // Search Results Content
+                      Expanded(
+                        child: FutureBuilder<List<dynamic>>(
+                          future: mapModel.placeAutoCompleteSearch(
+                              searchBarMapController.text),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return _buildLoadingState();
+                            } else if (snapshot.hasError) {
+                              return _buildErrorState();
+                            } else if (snapshot.hasData &&
+                                snapshot.data!.isEmpty) {
+                              return _buildEmptyState();
+                            } else if (snapshot.hasData) {
+                              return _buildSearchResults(snapshot.data!);
+                            } else {
+                              return _buildEmptyState();
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -297,56 +274,57 @@ class _MosqueMapState extends State<MosqueMap> {
                 ],
               ),
             ),
-            Positioned(
-              bottom: 20,
-              right: 10,
-              child: SpeedDial(
-                icon: FluentIcons.map_20_regular,
-                iconTheme: const IconThemeData(color: Colors.white),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    ColorTheme.primary,
-                    ColorTheme.primary.withOpacity(0.75),
-                  ],
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: SpeedDial(
+                    icon: FluentIcons.map_20_regular,
+                    iconTheme: const IconThemeData(color: Colors.white),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        ColorTheme.primary,
+                        ColorTheme.primary.withOpacity(0.75),
+                      ],
+                    ),
+                    gradientBoxShape: BoxShape.circle,
+                    visible: true,
+                    curve: Curves.bounceIn,
+                    overlayColor: Colors.black,
+                    overlayOpacity: 0.5,
+                    children: [
+                      SpeedDialChild(
+                        label: 'My Location',
+                        labelBackgroundColor: ColorTheme.primary,
+                        labelStyle: TextStyle(
+                          color: Colors.white,
+                          fontFamily: FontTheme().fontFamily,
+                        ),
+                        shape: const CircleBorder(),
+                        child: const Icon(FluentIcons.my_location_20_filled),
+                        onTap: () {
+                          _goToMyLocation();
+                        },
+                      ),
+                      SpeedDialChild(
+                        label: 'Malaysia View',
+                        labelBackgroundColor: ColorTheme.primary,
+                        labelStyle: TextStyle(
+                          color: Colors.white,
+                          fontFamily: FontTheme().fontFamily,
+                        ),
+                        shape: const CircleBorder(),
+                        child: const Icon(FluentIcons.globe_20_filled),
+                        onTap: () {
+                          _goToMalaysiaView();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                gradientBoxShape: BoxShape.circle,
-                visible: true,
-                curve: Curves.bounceIn,
-                overlayColor: Colors.black,
-                overlayOpacity: 0.5,
-                children: [
-                  SpeedDialChild(
-                    label: 'My Location',
-                    labelBackgroundColor: ColorTheme.primary,
-                    labelStyle: TextStyle(
-                      color: Colors.white,
-                      fontFamily: FontTheme().fontFamily,
-                    ),
-                    shape: const CircleBorder(),
-                    child: const Icon(FluentIcons.my_location_20_filled),
-                    onTap: () {
-                      setState(() {
-                        mapModel.goToMyLocation(context, mapController,
-                            pinMyLocation.latitude, pinMyLocation.longitude);
-                      });
-                    },
-                  ),
-                  SpeedDialChild(
-                    label: 'Malaysia View',
-                    labelBackgroundColor: ColorTheme.primary,
-                    labelStyle: TextStyle(
-                      color: Colors.white,
-                      fontFamily: FontTheme().fontFamily,
-                    ),
-                    shape: const CircleBorder(),
-                    child: const Icon(FluentIcons.globe_20_filled),
-                    onTap: () {
-                      setState(() {});
-                    },
-                  ),
-                ],
               ),
             )
           ],
@@ -358,12 +336,16 @@ class _MosqueMapState extends State<MosqueMap> {
   // Functions
   Future<void> callGetMosqueMarker() async {
     await mapModel.getMosqueMarker(mosqueMarkerProvider);
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> callGetLiveLocation() async {
     pinMyLocation = await homeModel.getLiveLocation(locationProvider);
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void onMarkerTapDraggableSheet(Marker marker) {
@@ -412,5 +394,251 @@ class _MosqueMapState extends State<MosqueMap> {
     latitudeDraggableSheet = '';
     longitudeDraggableSheet = '';
     distanceDraggableSheet = '';
+  }
+
+  // Safe method to expand draggable sheet
+  void _expandDraggableSheet() {
+    if (mounted && mapModel.dragController.isAttached) {
+      try {
+        mapModel.expandDraggableSheet();
+      } catch (e) {
+        // If it still fails, try again after a short delay
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted && mapModel.dragController.isAttached) {
+            try {
+              mapModel.expandDraggableSheet();
+            } catch (e) {
+              if (kDebugMode) {
+                print('Failed to expand draggable sheet: $e');
+              }
+            }
+          }
+        });
+      }
+    }
+  }
+
+  // Safe method to go to my location
+  void _goToMyLocation() {
+    try {
+      mapModel.goToMyLocation(
+        context,
+        mapController,
+        pinMyLocation.latitude,
+        pinMyLocation.longitude,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to go to my location: $e');
+      }
+    }
+  }
+
+  // Safe method to go to Malaysia view
+  void _goToMalaysiaView() {
+    try {
+      // Add your Malaysia view logic here
+      mapController.move(mapModel.defaultLatLng, 7);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to go to Malaysia view: $e');
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    searchBarMapController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            color: ColorTheme.primary,
+            strokeWidth: 3,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Searching...',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.wifi_off_rounded,
+                size: 48,
+                color: Colors.red.shade400,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No Internet Connection',
+              style: TextStyle(
+                fontFamily: FontTheme().fontFamily,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Please check your connection and try again',
+              style: TextStyle(
+                fontFamily: FontTheme().fontFamily,
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                setState(() {
+                  // Trigger rebuild to retry search
+                });
+              },
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorTheme.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.location_searching_rounded,
+                size: 48,
+                color: Colors.grey.shade500,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No Results Found',
+              style: TextStyle(
+                fontFamily: FontTheme().fontFamily,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              searchBarMapController.text.isEmpty
+                  ? 'Start typing to search for places'
+                  : 'Try a different search term',
+              style: TextStyle(
+                fontFamily: FontTheme().fontFamily,
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchResults(List<dynamic> data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Results count header
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            '${data.length} result${data.length == 1 ? '' : 's'} found',
+            style: TextStyle(
+              fontFamily: FontTheme().fontFamily,
+              fontSize: 14,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+
+        // Search results list
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            itemCount: data.length,
+            separatorBuilder: (context, index) => const Divider(
+              height: 0.5,
+              thickness: 0.5,
+              color: Colors.grey,
+              indent: 48,
+            ),
+            itemBuilder: (context, index) {
+              return LocationListTile(
+                location: data[index],
+                press: (value) async {
+                  setState(() {
+                    // Filtering Location Name
+                    clearDraggableSheet();
+
+                    List<String> arrayLocationName =
+                        formatter.splitAddressAtFirstComma(value);
+                    placeDraggableSheet = arrayLocationName[0];
+                    addressDraggableSheet = arrayLocationName[1];
+
+                    searchBarMapFlag = false;
+                    focusNode.unfocus();
+                  });
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

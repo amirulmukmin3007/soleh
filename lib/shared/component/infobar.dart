@@ -1,71 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:soleh/themes/colors.dart';
 import 'package:soleh/themes/fonts.dart';
 
 class InfoBar extends StatelessWidget {
   const InfoBar({
     super.key,
+    required this.label,
     required this.textDisplay,
     required this.icon,
-    required this.iconBackgroundColor,
-    required this.iconColor,
   });
 
+  final String label;
   final String textDisplay;
   final IconData icon;
-  final Color iconBackgroundColor;
-  final Color iconColor;
 
   @override
   Widget build(BuildContext context) {
     final FontTheme fontTheme = FontTheme();
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color.fromARGB(
-            255,
-            200,
-            200,
-            200,
-          ),
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 35,
-              width: 35,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    iconBackgroundColor,
-                    iconBackgroundColor.withOpacity(0.1),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(
-                  50,
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 20,
-                ),
-              ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: ColorTheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              size: 16,
+              color: ColorTheme.primary,
             ),
           ),
-          Text(
-            textDisplay,
-            style: TextStyle(
-              fontSize: 14,
-              fontFamily: fontTheme.fontFamily,
-              fontWeight: FontWeight.w400,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                    fontFamily: FontTheme().fontFamily,
+                  ),
+                ),
+                Text(
+                  textDisplay,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: FontTheme().fontFamily,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
