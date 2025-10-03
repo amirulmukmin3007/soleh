@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:soleh/features/home/screens/home.dart';
 import 'package:soleh/themes/colors.dart';
 import 'package:soleh/view/home.dart';
 import 'package:soleh/view/map.dart';
@@ -128,7 +129,8 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
       body: IndexedStack(
         index: currentPageIndex,
         children: [
-          Home(isActive: pageFlags[0]),
+          // Home(isActive: pageFlags[0]),
+          HomeScreen(),
           Qibla(isActive: pageFlags[1]),
           MosqueMap(isActive: pageFlags[2]),
           Settings(isActive: pageFlags[3]),

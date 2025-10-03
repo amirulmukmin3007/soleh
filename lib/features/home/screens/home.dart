@@ -1,67 +1,42 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:soleh/features/home/bloc/home_bloc.dart';
-import 'package:soleh/model/home_model.dart';
-import 'package:soleh/model/map_model.dart';
-import 'package:soleh/provider/asma_ul_husna_provider.dart';
-import 'package:soleh/provider/location_provider.dart';
-import 'package:soleh/provider/time_provider.dart';
-import 'package:soleh/provider/waktu_solat_provider.dart';
 import 'package:soleh/shared/component/asmaulhusna_card.dart';
 import 'package:soleh/shared/component/home_header.dart';
 import 'package:soleh/shared/component/scaffoldbackground.dart';
 import 'package:soleh/shared/component/shimmer.dart';
 import 'package:soleh/shared/component/waktusolat_card.dart';
 import 'package:soleh/shared/functions/formatter.dart';
-import 'package:location/location.dart';
 import 'package:soleh/themes/colors.dart';
 
-class Home extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   static const routeName = "/home";
-  const Home({super.key, required this.isActive});
-  final bool isActive;
+  const HomeScreen({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeState extends State<Home> with TickerProviderStateMixin {
-  late HomeModel homeModel;
-  late TimeProvider timeProvider;
-  late LocationProvider locationProvider;
-  late WaktuSolatProvider waktuSolatProvider;
-  late AsmaUlHusnaProvider asmaUlHusnaProvider;
-  late MapModel mapModel;
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _fadeAnimationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
   Formatter formatter = Formatter();
-  String currentWaktuSolat = '';
+  String currentTime = '';
+  String currentMeridiem = '';
   Timer? timer;
   Timer? minuteTimer;
-
-  // Loading states
-  bool isLocationLoading = true;
-  bool isWaktuSolatLoading = true;
-  bool isAsmaUlHusnaLoading = true;
-  bool isInitializing = true;
 
   @override
   void initState() {
     super.initState();
-    homeModel = HomeModel();
-    timeProvider = TimeProvider();
-    locationProvider = LocationProvider();
-    waktuSolatProvider = WaktuSolatProvider();
-    asmaUlHusnaProvider = AsmaUlHusnaProvider();
-    mapModel = MapModel();
 
-    // Initialize animation controller
+    currentTime = formatter.getTime();
+    currentMeridiem = formatter.getMeridiem();
+
     _fadeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -83,143 +58,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       curve: const Interval(0.0, 1.0, curve: Curves.easeOut),
     ));
 
-    homeModel
-        .getHijrahDate()
-        .then((value) => timeProvider.updateHijrahDate(value));
-    initialize();
+    context.read<HomeBloc>().add(HomeInitialEvent());
 
+    // Update time every second
     timer = Timer.periodic(
       const Duration(seconds: 1),
       (timer) {
         setState(() {
-          callGetTime();
+          currentTime = formatter.getTime();
+          currentMeridiem = formatter.getMeridiem();
         });
       },
-    );
-
-    minuteTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      callGetLiveLocation();
-      callGetLocationName();
-      callGetCurrentWaktuSolat();
-    });
-  }
-
-  void initialize() async {
-    await callGetTime();
-    await callGetWaktuSolatToday();
-    await callGetLiveLocation();
-    await callGetLocationName();
-    callGetCurrentWaktuSolat();
-    await callGetAsmaUlHusna();
-
-    // Start the fade-up animation after initialization
-    setState(() {
-      isInitializing = false;
-    });
-    _fadeAnimationController.forward();
-  }
-
-  Future<void> callGetTime() async {
-    timeProvider.updateCurrentTime(formatter.getTime());
-    timeProvider.updateCurrentMeridiem(formatter.getMeridiem());
-    setState(() {});
-  }
-
-  Future<void> callGetHijrahDate() async {
-    homeModel
-        .getHijrahDate()
-        .then((value) => timeProvider.updateHijrahDate(value));
-    setState(() {});
-  }
-
-  Future<void> callGetLiveLocation() async {
-    setState(() {
-      isLocationLoading = true;
-    });
-    await homeModel.getLiveLocation(locationProvider);
-    setState(() {
-      isLocationLoading = false;
-    });
-  }
-
-  Future<void> callGetLocationName() async {
-    double lat = locationProvider.currentLatitude ?? mapModel.defaultLat;
-    double lng = locationProvider.currentLongitude ?? mapModel.defaultLng;
-    await homeModel.getLocationName(locationProvider, lat, lng);
-    setState(() {});
-  }
-
-  Future<void> callGetWaktuSolatToday() async {
-    setState(() {
-      isWaktuSolatLoading = true;
-    });
-    double lat = locationProvider.currentLatitude ?? mapModel.defaultLat;
-    double lng = locationProvider.currentLongitude ?? mapModel.defaultLng;
-    await homeModel.getWaktuSolatToday(waktuSolatProvider, lat, lng);
-    setState(() {
-      isWaktuSolatLoading = false;
-    });
-  }
-
-  void callGetCurrentWaktuSolat() {
-    currentWaktuSolat = formatter.getCurrentWaktuSolat(
-        waktuSolatProvider.waktuSolatTime, waktuSolatProvider.waktuSolatLabel);
-    setState(() {});
-  }
-
-  Future<void> callGetAsmaUlHusna() async {
-    setState(() {
-      isAsmaUlHusnaLoading = true;
-    });
-    await homeModel.getAsmaUlHusna(asmaUlHusnaProvider);
-    setState(() {
-      isAsmaUlHusnaLoading = false;
-    });
-  }
-
-  Widget _buildWaktuSolatCardShimmer() {
-    return Container(
-      height: 200, // Adjust based on your card height
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white.withOpacity(0.1),
-      ),
-      child: Shimmer(
-        gradient: const LinearGradient(
-          colors: [Colors.white, Colors.white70],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white.withOpacity(0.3),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAsmaUlHusnaCardShimmer() {
-    return Container(
-      height: 120, // Adjust based on your card height
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white.withOpacity(0.1),
-      ),
-      child: Shimmer(
-        gradient: const LinearGradient(
-          colors: [Colors.white, Colors.white70],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white.withOpacity(0.3),
-          ),
-        ),
-      ),
     );
   }
 
@@ -249,22 +98,38 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final homeBloc = HomeBloc();
-    return BlocConsumer(
-      bloc: homeBloc,
-      // listenWhen: (previous, current) {},
-      // buildWhen: (previous, current) {},
-      listener: (context, state) {},
-      builder: (context, state) {
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: ScaffoldBackground(
-            child: SafeArea(
-              child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: ScaffoldBackground(
+        child: SafeArea(
+          child: BlocConsumer<HomeBloc, HomeState>(
+            listener: (context, state) {
+              if (state is HomeLoaded) {
+                _fadeAnimationController.forward();
+              }
+            },
+            builder: (context, state) {
+              if (state is HomeInitial || state is HomeLoading) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(color: ColorTheme.primary),
+                      SizedBox(height: 16),
+                      Text(
+                        'Please allow location access to view prayer times',
+                        style: TextStyle(color: ColorTheme.primary),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return SingleChildScrollView(
                 child: Column(
                   children: [
                     // Header with shimmer for location if loading
-                    isLocationLoading
+                    state is HomeLoading
                         ? Container(
                             padding: const EdgeInsets.all(20),
                             child: Shimmer(
@@ -282,13 +147,31 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                               ),
                             ),
                           )
-                        : HomeHeader(
-                            currentHijrahDate: timeProvider.hijrahDate,
-                            currentTime: timeProvider.currentTime,
-                            currentMeridiem: timeProvider.currentMeridiem,
-                            currentLocation:
-                                locationProvider.currentLocationName,
-                          ),
+                        : state is HomeLoaded
+                            ? HomeHeader(
+                                currentHijrahDate:
+                                    state.hijrahDate.currentHijrahDate,
+                                currentTime: currentTime,
+                                currentMeridiem: currentMeridiem,
+                                currentLocation: state.locationName,
+                              )
+                            : Container(
+                                padding: const EdgeInsets.all(20),
+                                child: Shimmer(
+                                  gradient: const LinearGradient(
+                                    colors: [Colors.white, Colors.white70],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  child: Container(
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.white.withOpacity(0.3),
+                                    ),
+                                  ),
+                                ),
+                              ),
                     Padding(
                       padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                       child: Column(
@@ -296,35 +179,73 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           Column(
                             children: [
                               const SizedBox(height: 10),
-                              // Waktu Solat Card with shimmer and animation
-                              isWaktuSolatLoading || isInitializing
-                                  ? _buildWaktuSolatCardShimmer()
+                              state is! HomeLoaded
+                                  ? ShimmerCard(height: 200)
                                   : _buildAnimatedCard(
                                       index: 0,
                                       child: WaktuSolatCard(
-                                        today: homeModel.currentDay,
-                                        currentWaktuSolat: currentWaktuSolat,
-                                        subuh: waktuSolatProvider.subuh,
-                                        syuruk: waktuSolatProvider.syuruk,
-                                        zohor: waktuSolatProvider.zohor,
-                                        asar: waktuSolatProvider.asar,
-                                        maghrib: waktuSolatProvider.maghrib,
-                                        isyak: waktuSolatProvider.isyak,
+                                        today: state.hijrahDate.currentDay,
+                                        currentWaktuSolat:
+                                            state.currentWaktuSolat,
+                                        subuh: state.prayerTimes.subuh,
+                                        syuruk: state.prayerTimes.syuruk,
+                                        zohor: state.prayerTimes.zohor,
+                                        asar: state.prayerTimes.asar,
+                                        maghrib: state.prayerTimes.maghrib,
+                                        isyak: state.prayerTimes.isyak,
                                       ),
                                     ),
                               const SizedBox(height: 10),
-                              // Asma Ul Husna Card with shimmer and animation
-                              isAsmaUlHusnaLoading || isInitializing
-                                  ? _buildAsmaUlHusnaCardShimmer()
+                              state is! HomeLoaded
+                                  ? ShimmerCard(height: 120)
                                   : _buildAnimatedCard(
                                       index: 1,
-                                      child: AsmaUlHusnaCard(
-                                        asmaUlHusnaProvider:
-                                            asmaUlHusnaProvider,
-                                        homeModel: homeModel,
+                                      child: AsmaUlHusnaCard2(
+                                        auhMeaning:
+                                            state.asmaUlHusna.auhMeaning,
+                                        auhAR: state.asmaUlHusna.auhAR,
+                                        auhEN: state.asmaUlHusna.auhEN,
+                                        auhNum: state.asmaUlHusna.auhNum,
+                                        dayPicture: state
+                                            .dayPicture, // Pass the day picture
+                                        onRefresh: () {
+                                          // Reset animation
+                                          _fadeAnimationController.reset();
+                                          // Refresh data
+                                          context
+                                              .read<HomeBloc>()
+                                              .add(HomeRefreshDataEvent());
+                                        },
                                       ),
                                     ),
                               const SizedBox(height: 10),
+                              // Error state
+                              if (state is HomeError)
+                                Container(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Column(
+                                    children: [
+                                      const Icon(Icons.error,
+                                          size: 48, color: Colors.red),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        state.message,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          context
+                                              .read<HomeBloc>()
+                                              .add(HomeInitialEvent());
+                                        },
+                                        child: const Text('Retry'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                             ],
                           ),
                           const SizedBox(height: 100)
@@ -333,11 +254,11 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     )
                   ],
                 ),
-              ),
-            ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
