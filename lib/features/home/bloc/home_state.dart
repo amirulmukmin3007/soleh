@@ -15,6 +15,7 @@ class HomeLoaded extends HomeState {
   final AsmaUlHusnaModel asmaUlHusna;
   final String dayPicture;
   final String currentWaktuSolat;
+  final ZikirHarianModel zikirHarian;
 
   HomeLoaded({
     required this.hijrahDate,
@@ -23,6 +24,7 @@ class HomeLoaded extends HomeState {
     required this.asmaUlHusna,
     required this.dayPicture,
     required this.currentWaktuSolat,
+    required this.zikirHarian,
   });
 }
 

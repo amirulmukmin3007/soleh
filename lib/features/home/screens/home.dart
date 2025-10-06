@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_islamic_icons/flutter_islamic_icons.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:soleh/features/home/bloc/home_bloc.dart';
 import 'package:soleh/shared/component/asmaulhusna_card.dart';
 import 'package:soleh/shared/component/home_header.dart';
+import 'package:soleh/shared/component/menu_box.dart';
 import 'package:soleh/shared/component/scaffoldbackground.dart';
 import 'package:soleh/shared/component/shimmer.dart';
 import 'package:soleh/shared/component/waktusolat_card.dart';
+import 'package:soleh/shared/component/zikir_harian_card.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:soleh/themes/colors.dart';
 
@@ -29,6 +32,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String currentMeridiem = '';
   Timer? timer;
   Timer? minuteTimer;
+
+  List<Map<String, dynamic>> menus = [
+    {
+      'icon': FlutterIslamicIcons.solidTasbihHand,
+      'title': 'Tasbih',
+      'route': '/menu',
+    },
+    {
+      'icon': FlutterIslamicIcons.calendar,
+      'title': 'Kalendar',
+      'route': '/menu',
+    },
+    {
+      'icon': FlutterIslamicIcons.locationMosque,
+      'title': 'Masjid',
+      'route': '/menu',
+    },
+  ];
 
   @override
   void initState() {
@@ -100,8 +121,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: ScaffoldBackground(
-        child: SafeArea(
+      body: Padding(
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top,
+        ),
+        child: ScaffoldBackground(
           child: BlocConsumer<HomeBloc, HomeState>(
             listener: (context, state) {
               if (state is HomeLoaded) {
@@ -197,9 +221,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     ),
                               const SizedBox(height: 10),
                               state is! HomeLoaded
-                                  ? ShimmerCard(height: 120)
+                                  ? ShimmerCard(height: 200)
                                   : _buildAnimatedCard(
                                       index: 1,
+                                      child: Wrap(
+                                        alignment: WrapAlignment.spaceEvenly,
+                                        children: menus.map((item) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: MenuBox(
+                                              icon: item['icon'],
+                                              label: item['title'],
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                              const SizedBox(height: 10),
+                              state is! HomeLoaded
+                                  ? ShimmerCard(height: 120)
+                                  : _buildAnimatedCard(
+                                      index: 2,
                                       child: AsmaUlHusnaCard2(
                                         auhMeaning:
                                             state.asmaUlHusna.auhMeaning,
@@ -216,6 +258,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               .read<HomeBloc>()
                                               .add(HomeRefreshDataEvent());
                                         },
+                                      ),
+                                    ),
+                              const SizedBox(height: 10),
+                              state is! HomeLoaded
+                                  ? ShimmerCard(height: 200)
+                                  : _buildAnimatedCard(
+                                      index: 3,
+                                      child: ZikirDailyCard(
+                                        title: state.zikirHarian.title,
+                                        imageUrl: state.zikirHarian.imageUrl,
+                                        day: state.zikirHarian.day,
+                                        dayName: state.zikirHarian.dayName,
                                       ),
                                     ),
                               const SizedBox(height: 10),

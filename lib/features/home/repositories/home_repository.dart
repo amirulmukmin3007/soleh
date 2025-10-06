@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:soleh/shared/api/general.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/functions/formatter.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:html/dom.dart';
 
 class HomeRepository {
   final Formatter formatter = Formatter();
@@ -175,5 +177,102 @@ class HomeRepository {
     if (hour >= 12 && hour < 17) return 'assets/images/afternoon_time.jpg';
     if (hour >= 17 && hour < 20) return 'assets/images/evening_time.jpg';
     return 'assets/images/night_time.jpg';
+  }
+
+  Future<Map<String, dynamic>> getZikirDaily() async {
+    try {
+      final response = await http.get(
+        Uri.parse("https://akuislam.com/panduan/zikir-harian-rumi/"),
+      );
+
+      if (response.statusCode != 200) {
+        print('Failed to load page: ${response.statusCode}');
+        return {};
+      }
+
+      // Parse HTML
+      final document = html_parser.parse(response.body);
+
+      // Map of day names to their index (1 = Monday, 7 = Sunday)
+      final dayMap = {
+        'isnin': 1, // Monday
+        'selasa': 2, // Tuesday
+        'rabu': 3, // Wednesday
+        'khamis': 4, // Thursday
+        'jumaat': 5, // Friday
+        'sabtu': 6, // Saturday
+        'ahad': 7, // Sunday
+      };
+
+      // Get current day (1 = Monday, 7 = Sunday)
+      final today = DateTime.now().weekday;
+
+      // Find all h3 headers with ids starting with "h-zikir-hari-"
+      final headers = document.querySelectorAll('h3[id^="h-zikir-hari-"]');
+
+      for (var header in headers) {
+        try {
+          final id = header.attributes['id'] ?? '';
+
+          // Extract day name from id (e.g., "h-zikir-hari-isnin" -> "isnin")
+          final dayName = id.replaceAll('h-zikir-hari-', '');
+
+          if (!dayMap.containsKey(dayName)) continue;
+
+          // Check if this is today's zikir
+          if (dayMap[dayName] == today) {
+            // Get the title text
+            final title = header.text.trim();
+
+            // Find image by matching the title attribute with day name
+            String? imageUrl;
+
+            // Search for image with title containing the day name
+            final allImages = document.querySelectorAll('img[data-src]');
+            for (var img in allImages) {
+              final imgTitle = img.attributes['title'] ?? '';
+              // Check if title contains "zikir-" followed by the day name
+              // e.g., "zikir-isnin@2x", "zikir-hari-selasa@2x", etc.
+              if (imgTitle.contains('zikir') &&
+                  (imgTitle.contains(dayName) ||
+                      imgTitle.contains('hari-$dayName'))) {
+                imageUrl = img.attributes['data-src'];
+                break;
+              }
+            }
+
+            print('Image URL: $imageUrl');
+
+            // Return today's zikir immediately
+            return {
+              'title': title,
+              'imageUrl': imageUrl ?? '',
+              'day': dayMap[dayName],
+              'dayName': dayName,
+            };
+          }
+        } catch (e) {
+          print('Error parsing item: $e');
+        }
+      }
+
+      return {};
+    } catch (e) {
+      print('Error in getZikirDaily: $e');
+      return {};
+    }
+  }
+
+  Map<String, dynamic>? getTodayZikir(List<Map<String, dynamic>> zikirList) {
+    final today = DateTime.now().weekday; // 1 = Monday, 7 = Sunday
+
+    try {
+      return zikirList.firstWhere(
+        (zikir) => zikir['day'] == today,
+      );
+    } catch (e) {
+      print('No zikir found for today');
+      return null;
+    }
   }
 }

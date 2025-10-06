@@ -222,6 +222,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
+  flutter_islamic_icons:
+    dependency: "direct main"
+    description:
+      name: flutter_islamic_icons
+      sha256: e3013fc04cadd49bc9afba00fc51028e5e5daf4657f4988d678f64e62ce63a36
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -481,7 +489,7 @@ packages:
     source: hosted
     version: "2.2.3"
   html:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: html
       sha256: "6d1264f2dffa1b1101c25a91dff0dc2daee4c18e87cd8538729773c073dbf602"

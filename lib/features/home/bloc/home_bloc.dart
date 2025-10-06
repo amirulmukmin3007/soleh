@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:soleh/features/home/models/asma_ul_husna.dart';
 import 'package:soleh/features/home/models/hijrah_date.dart';
 import 'package:soleh/features/home/models/prayer_times.dart';
+import 'package:soleh/features/home/models/zikir_harian_model.dart';
 import 'package:soleh/features/home/repositories/home_repository.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:geolocator/geolocator.dart' as geo;
@@ -39,6 +40,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       Map<String, String> prayerTimesData =
           await repository.getPrayerTimes(lat, lng);
       Map<String, String> asmaUlHusnaData = await repository.getAsmaUlHusna();
+      Map<String, dynamic> zikirData = await repository.getZikirDaily();
       String dayPicture = repository.getDayPicture();
 
       // Create models
@@ -65,6 +67,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         currentHijrahDate: hijrahData['currentHijrahDate'] ?? '',
       );
 
+      final zikirHarianModel = ZikirHarianModel(
+        title: zikirData['title'] ?? '',
+        imageUrl: zikirData['imageUrl'] ?? '',
+        day: zikirData['day'] ?? '',
+        dayName: zikirData['dayName'] ?? '',
+      );
+
       String currentWaktuSolat = _calculateCurrentWaktuSolat(prayerTimesModel);
       emit(HomeLoaded(
         hijrahDate: hijrahDateModel,
@@ -73,6 +82,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         asmaUlHusna: asmaUlHusnaModel,
         dayPicture: dayPicture,
         currentWaktuSolat: currentWaktuSolat,
+        zikirHarian: zikirHarianModel,
       ));
     } catch (e, stackTrace) {
       print('Stack trace: $stackTrace');
