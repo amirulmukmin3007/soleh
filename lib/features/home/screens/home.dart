@@ -134,18 +134,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             },
             builder: (context, state) {
               if (state is HomeInitial || state is HomeLoading) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(color: ColorTheme.primary),
-                      SizedBox(height: 16),
-                      Text(
-                        'Please allow location access to view prayer times',
-                        style: TextStyle(color: ColorTheme.primary),
-                        textAlign: TextAlign.center,
+                return ScaffoldBackground(
+                  child: Center(
+                    child: Material(
+                      elevation: 8,
+                      borderRadius: BorderRadius.circular(30),
+                      child: Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.1,
+                          vertical: MediaQuery.of(context).size.height * 0.3,
+                        ),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ]),
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: Icon(
+                                Icons.location_searching_rounded,
+                                size: 48,
+                                color: ColorTheme.primary,
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            CircularProgressIndicator(
+                                color: ColorTheme.primary),
+                            SizedBox(height: 16),
+                            Text(
+                              'Please wait for the app to be ready',
+                              style: TextStyle(color: ColorTheme.primary),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 );
               }
