@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:soleh/features/home/screens/home.dart';
 import 'package:soleh/themes/colors.dart';
-import 'package:soleh/view/home.dart';
 import 'package:soleh/view/map.dart';
 import 'package:soleh/view/qibla.dart';
 import 'package:soleh/view/settings.dart';
@@ -109,7 +108,7 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 15,
               offset: const Offset(0, 4),
               spreadRadius: 1,
@@ -140,7 +139,6 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
   }
 
   Widget _buildNavItem(int index) {
-    final isActive = currentPageIndex == index;
     final navItem = _navItems[index];
 
     return Expanded(
@@ -169,7 +167,7 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
                           width: indicatorSize,
                           height: indicatorSize,
                           decoration: BoxDecoration(
-                            color: ColorTheme.primary.withOpacity(0.1),
+                            color: ColorTheme.primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                         ),

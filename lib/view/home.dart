@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:soleh/model/home_model.dart';
 import 'package:soleh/model/map_model.dart';
@@ -12,11 +10,8 @@ import 'package:soleh/provider/waktu_solat_provider.dart';
 import 'package:soleh/shared/component/asmaulhusna_card.dart';
 import 'package:soleh/shared/component/home_header.dart';
 import 'package:soleh/shared/component/scaffoldbackground.dart';
-import 'package:soleh/shared/component/shimmer.dart';
 import 'package:soleh/shared/component/waktusolat_card.dart';
 import 'package:soleh/shared/functions/formatter.dart';
-import 'package:location/location.dart';
-import 'package:soleh/themes/colors.dart';
 
 class Home extends StatefulWidget {
   static const routeName = "/home";
@@ -180,7 +175,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       height: 200, // Adjust based on your card height
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
       ),
       child: Shimmer(
         gradient: const LinearGradient(
@@ -191,7 +186,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -203,7 +198,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       height: 120, // Adjust based on your card height
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
       ),
       child: Shimmer(
         gradient: const LinearGradient(
@@ -214,7 +209,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -268,7 +263,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             height: 60,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                             ),
                           ),
                         ),

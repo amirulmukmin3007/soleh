@@ -1,13 +1,10 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'package:soleh/model/map_model.dart';
 import 'package:soleh/model/home_model.dart';
@@ -166,7 +163,7 @@ class _MosqueMapState extends State<MosqueMap> {
                           color: Colors.white,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -287,7 +284,7 @@ class _MosqueMapState extends State<MosqueMap> {
                       end: Alignment.bottomRight,
                       colors: [
                         ColorTheme.primary,
-                        ColorTheme.primary.withOpacity(0.75),
+                        ColorTheme.primary.withValues(alpha: 0.75),
                       ],
                     ),
                     gradientBoxShape: BoxShape.circle,
@@ -354,11 +351,11 @@ class _MosqueMapState extends State<MosqueMap> {
     String refid = key.replaceAll(RegExp(r"[<>'\[\]]"), '');
     Map<String, dynamic> result = {};
 
-    mosqueMarkerProvider.markersInfo.forEach((element) {
+    for (var element in mosqueMarkerProvider.markersInfo) {
       if (element['refid'] == int.parse(refid)) {
         result = element;
       }
-    });
+    }
 
     if (result.isNotEmpty) {
       // Ensure that all required fields exist before using them
@@ -486,7 +483,7 @@ class _MosqueMapState extends State<MosqueMap> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -551,7 +548,7 @@ class _MosqueMapState extends State<MosqueMap> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.grey.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(

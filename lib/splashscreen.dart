@@ -4,7 +4,7 @@ import 'package:soleh/themes/colors.dart';
 import 'package:soleh/view/bottomnavigationbar.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -109,8 +109,8 @@ class _SplashScreenState extends State<SplashScreen>
             end: Alignment.bottomRight,
             colors: [
               ColorTheme.primary,
-              ColorTheme.primary.withOpacity(0.8),
-              ColorTheme.primary.withOpacity(0.6),
+              ColorTheme.primary.withValues(alpha: 0.8),
+              ColorTheme.primary.withValues(alpha: 0.6),
             ],
           ),
         ),
@@ -127,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 200,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                   ),
                 ),
               ),
@@ -142,7 +142,7 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 300,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                   ),
                 ),
               ),
@@ -164,7 +164,7 @@ class _SplashScreenState extends State<SplashScreen>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 30,
                               spreadRadius: 5,
                             ),
@@ -197,7 +197,7 @@ class _SplashScreenState extends State<SplashScreen>
                               letterSpacing: 2,
                               shadows: [
                                 Shadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   offset: const Offset(0, 2),
                                   blurRadius: 4,
                                 ),
@@ -209,7 +209,7 @@ class _SplashScreenState extends State<SplashScreen>
                             'Prayer Times & Guidance',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                               letterSpacing: 1,
                             ),
                           ),
@@ -229,7 +229,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: CircularProgressIndicator(
                         strokeWidth: 3,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white.withOpacity(0.8),
+                          Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -250,7 +250,7 @@ class _SplashScreenState extends State<SplashScreen>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ),

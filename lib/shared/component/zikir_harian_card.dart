@@ -7,12 +7,12 @@ class ZikirDailyCard extends StatelessWidget {
   final String dayName;
 
   const ZikirDailyCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.imageUrl,
     required this.day,
     required this.dayName,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -157,18 +157,5 @@ class ZikirDailyCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _getDayNameMalay(String dayName) {
-    final dayNames = {
-      'isnin': 'Isnin',
-      'selasa': 'Selasa',
-      'rabu': 'Rabu',
-      'khamis': 'Khamis',
-      'jumaat': 'Jumaat',
-      'sabtu': 'Sabtu',
-      'ahad': 'Ahad',
-    };
-    return dayNames[dayName] ?? dayName;
   }
 }

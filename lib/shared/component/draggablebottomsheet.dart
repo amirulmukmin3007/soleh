@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
 
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
-import 'package:simple_icons/simple_icons.dart';
 import 'package:soleh/model/masjid_location_model.dart';
 import 'package:soleh/shared/component/infobar.dart';
 import 'package:soleh/themes/colors.dart';
@@ -40,10 +37,10 @@ class DraggableSheet extends StatefulWidget {
   final String currentLong;
 
   @override
-  _DraggableSheetState createState() => _DraggableSheetState();
+  DraggableSheetState createState() => DraggableSheetState();
 }
 
-class _DraggableSheetState extends State<DraggableSheet> {
+class DraggableSheetState extends State<DraggableSheet> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -64,7 +61,7 @@ class _DraggableSheetState extends State<DraggableSheet> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 offset: const Offset(0, -2),
                 blurRadius: 10,
               ),
@@ -258,102 +255,6 @@ class _DraggableSheetState extends State<DraggableSheet> {
               : null,
         );
       },
-    );
-  }
-
-  Widget _buildInfoRow(
-      {required IconData icon, required String label, required String value}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: ColorTheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              size: 16,
-              color: ColorTheme.primary,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                    fontFamily: FontTheme().fontFamily,
-                  ),
-                ),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: FontTheme().fontFamily,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Helper method to build navigation buttons
-  Widget _buildNavigationButton({
-    required IconData iconData,
-    required String text,
-    required Color backgroundColor,
-    required Color iconColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                iconData,
-                size: 24,
-                color: iconColor,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: FontTheme().fontFamily,
-                ),
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 16,
-              color: Colors.grey,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

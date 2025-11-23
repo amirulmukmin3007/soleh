@@ -1,12 +1,8 @@
-import 'dart:async';
-
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:soleh/provider/waktu_solat_provider.dart';
 import 'package:soleh/shared/component/circlebutton.dart';
 import 'package:soleh/shared/component/shimmer.dart';
-import 'package:soleh/shared/functions/formatter.dart';
 import 'package:soleh/themes/colors.dart';
 
 class WaktuSolatCard extends StatefulWidget {

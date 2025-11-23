@@ -6,37 +6,32 @@ import 'package:soleh/shared/api/general.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:html/dom.dart';
 
 class HomeRepository {
   final Formatter formatter = Formatter();
 
   Future<geo.Position> getLiveLocation() async {
-    print("🔄 GETTING LOCATION (Geolocator)...");
-
     geo.LocationPermission permission = await geo.Geolocator.checkPermission();
 
     if (permission == geo.LocationPermission.denied) {
       permission = await geo.Geolocator.requestPermission();
       if (permission == geo.LocationPermission.denied) {
-        print("❌ Location permission denied.");
         return geo.Position.fromMap({});
       }
     }
 
     if (permission == geo.LocationPermission.deniedForever) {
-      print("❌ Location permissions are permanently denied.");
       return geo.Position.fromMap({});
     }
 
     try {
       geo.Position position = await geo.Geolocator.getCurrentPosition(
-        desiredAccuracy: geo.LocationAccuracy.high,
+        locationSettings:
+            geo.AndroidSettings(accuracy: geo.LocationAccuracy.high),
       );
 
       return position;
     } catch (e) {
-      print("🚨 Failed to get location: $e");
       return geo.Position.fromMap({});
     }
   }
@@ -59,9 +54,6 @@ class HomeRepository {
             holiday = data['data']['hijri']['holidays'][0];
           }
 
-          print(
-              "${data['data']['hijri']['day']} ${data['data']['hijri']['month']['en']} ${data['data']['hijri']['year']}");
-
           return {
             'holiday': holiday,
             'currentDate': setDate,
@@ -82,7 +74,6 @@ class HomeRepository {
       final String url =
           'https://$googleMapsUrl/maps/api/geocode/json?latlng=$latitude,$longitude&key=$googleMapKey';
 
-      print(url);
       final response = await http.get(Uri.parse(url));
       final json = jsonDecode(response.body);
 

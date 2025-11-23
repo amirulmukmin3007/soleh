@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +10,6 @@ import 'package:http/http.dart' as http;
 import 'dart:math' show cos, sqrt, asin;
 import 'package:intl/intl.dart';
 import 'package:soleh/shared/component/dialogs.dart';
-import 'package:soleh/shared/component/draggablebottomsheet.dart';
 
 class MapModel {
   LatLng defaultLatLng = const LatLng(3.14, 101.69);
@@ -41,7 +38,8 @@ class MapModel {
   List<Map<String, dynamic>> markerListInfo = [];
   bool markerListFlag = false;
 
-  void goToMyLocation(context, mapController, double? myLat, double? myLong) {
+  void goToMyLocation(BuildContext context, MapController mapController,
+      double? myLat, double? myLong) {
     if (myLat == null || myLong == null) {
       CustomDialog.show(context,
           title: 'Location Unavailable',

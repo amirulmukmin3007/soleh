@@ -24,7 +24,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     HomeEvent event,
     Emitter<HomeState> emit,
   ) async {
-    print('🟦 Starting loadAllData');
     emit(HomeLoading());
 
     try {

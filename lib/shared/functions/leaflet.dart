@@ -9,13 +9,13 @@ class LeafletFunction {
     String refid = key.replaceAll(RegExp(r"[<>'\[\]]"), '');
     Map<String, dynamic> result = {};
 
-    mosqueMarkerProvider.markersInfo.forEach((element) {
+    for (var element in mosqueMarkerProvider.markersInfo) {
       if (element['refid'] == refid) {
         result = element;
       } else {
         result = {};
       }
-    });
+    }
 
     return result;
   }

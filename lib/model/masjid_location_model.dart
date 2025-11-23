@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' show cos, sqrt, asin;
-import 'dart:isolate';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:soleh/shared/api/general.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/functions/formatter.dart';
@@ -303,12 +301,8 @@ class MapModel {
       var data = jsonDecode(jsonString);
       data = data['Sheet1'];
 
-      print(data);
-
       if (data is List) {
         for (var point in data) {
-          print('Nice');
-          // String markerImage = setMarkerType(point['service_type']);
           Marker marker = Marker(
             key: Key(point['refid'].toString()),
             width: 40.0,
@@ -420,7 +414,7 @@ class MapModel {
       radius: double.parse(radius),
       point: LatLng(currentLat, currentLng),
       useRadiusInMeter: true,
-      color: ColorTheme.primary.withOpacity(0.2),
+      color: ColorTheme.primary.withValues(alpha: 0.2),
       borderColor: ColorTheme.primary,
       borderStrokeWidth: 2.0,
     );

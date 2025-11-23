@@ -128,7 +128,7 @@ class LocationListTile extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: ColorTheme.primary.withOpacity(0.1),
+                color: ColorTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -245,7 +245,7 @@ class LocationListTileEnhanced extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -261,7 +261,7 @@ class LocationListTileEnhanced extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       ColorTheme.primary,
-                      ColorTheme.primary.withOpacity(0.8),
+                      ColorTheme.primary.withValues(alpha: 0.8),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -269,7 +269,7 @@ class LocationListTileEnhanced extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: ColorTheme.primary.withOpacity(0.3),
+                      color: ColorTheme.primary.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -328,7 +328,7 @@ class LocationListTileEnhanced extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: ColorTheme.primary.withOpacity(0.1),
+                          color: ColorTheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(

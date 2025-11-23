@@ -16,7 +16,6 @@ class InfoBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FontTheme fontTheme = FontTheme();
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -24,7 +23,7 @@ class InfoBar extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: ColorTheme.primary.withOpacity(0.1),
+              color: ColorTheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -65,13 +64,13 @@ class InfoBar extends StatelessWidget {
 
 class InfoBarClickable extends StatefulWidget {
   const InfoBarClickable({
-    Key? key,
+    super.key,
     required this.textDisplay,
     required this.icon,
     required this.iconBackgroundColor,
     required this.iconColor,
     required this.function,
-  }) : super(key: key);
+  });
 
   final String textDisplay;
   final IconData icon;
@@ -80,10 +79,10 @@ class InfoBarClickable extends StatefulWidget {
   final VoidCallback function;
 
   @override
-  _InfoBarClickableState createState() => _InfoBarClickableState();
+  InfoBarClickableState createState() => InfoBarClickableState();
 }
 
-class _InfoBarClickableState extends State<InfoBarClickable> {
+class InfoBarClickableState extends State<InfoBarClickable> {
   bool _isTapped = false;
 
   @override
@@ -123,7 +122,7 @@ class _InfoBarClickableState extends State<InfoBarClickable> {
               ? []
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     offset: const Offset(0, 4),
                     blurRadius: 8,
                   ),

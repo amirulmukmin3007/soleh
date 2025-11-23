@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:provider/provider.dart';
 
 class LocationProvider extends ChangeNotifier {
   late LocationData _currentLocation;

@@ -31,7 +31,7 @@ class CircleButton extends StatelessWidget {
             height: 50,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: buttonColor.withOpacity(0.3),
+              color: buttonColor.withValues(alpha: 0.3),
             ),
             child: Center(
               child: Icon(
