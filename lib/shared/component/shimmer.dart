@@ -27,10 +27,10 @@ class ShimmerCard extends StatelessWidget {
   final double borderRadius;
 
   const ShimmerCard({
-    Key? key,
+    super.key,
     required this.height,
     this.borderRadius = 12,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
