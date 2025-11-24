@@ -38,6 +38,7 @@ dependencies:
   simple_icons: ^14.6.1
   shimmer: ^3.0.0
   sliding_clipped_nav_bar: ^3.1.1
+  supabase_flutter: ^2.10.3
   timezone: ^0.10.1
   unicons: ^3.0.0
   url_launcher: ^6.3.1

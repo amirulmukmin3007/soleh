@@ -12,9 +12,11 @@ import 'package:soleh/provider/waktu_solat_provider.dart';
 import 'package:soleh/splashscreen.dart';
 import 'package:soleh/themes/fonts.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
+
   // runApp(const MainApp());
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider<LocationProvider>(create: (_) => LocationProvider()),

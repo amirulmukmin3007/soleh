@@ -92,7 +92,7 @@ class Formatter {
       List<String> waktuSolatToday, List<String> waktuSolatList) {
     TimeOfDay currentTime = TimeOfDay.now();
 
-    print(waktuSolatToday.toString() + ' ' + waktuSolatList.toString());
+    print('$waktuSolatToday $waktuSolatList');
 
     List<TimeOfDay> times = waktuSolatToday.map((waktuSolat) {
       List<String> parts = waktuSolat.split(':');

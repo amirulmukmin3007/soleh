@@ -299,7 +299,6 @@ class MapModel {
       String jsonString =
           await rootBundle.loadString('assets/datasets/senarai_masjid.json');
       var data = jsonDecode(jsonString);
-      data = data['Sheet1'];
 
       if (data is List) {
         for (var point in data) {
