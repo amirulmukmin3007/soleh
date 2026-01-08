@@ -15,7 +15,7 @@ class AppNavBar extends StatefulWidget {
 
 class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
   int currentPageIndex = 0;
-  List<bool> pageFlags = [true, false, false, false];
+  List<bool> pageFlags = [true, false, false, false, false];
 
   // Controllers for the animated indicators
   late final List<AnimationController> _controllers;
@@ -37,6 +37,11 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
       icon: FluentIcons.location_24_regular,
       activeIcon: FluentIcons.location_24_filled,
       label: 'Map',
+    ),
+    NavItem(
+      icon: FluentIcons.calendar_12_regular,
+      activeIcon: FluentIcons.calendar_12_filled,
+      label: 'Calendar',
     ),
     NavItem(
       icon: FluentIcons.settings_16_regular,
@@ -132,7 +137,8 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
           HomeScreen(),
           Qibla(isActive: pageFlags[1]),
           MosqueMap(isActive: pageFlags[2]),
-          Settings(isActive: pageFlags[3]),
+          Placeholder(),
+          Settings(isActive: pageFlags[4]),
         ],
       ),
     );

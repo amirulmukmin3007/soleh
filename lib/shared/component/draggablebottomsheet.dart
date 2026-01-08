@@ -2,8 +2,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
-
-import 'package:soleh/model/masjid_location_model.dart';
 import 'package:soleh/shared/component/infobar.dart';
 import 'package:soleh/themes/colors.dart';
 import 'package:soleh/themes/fonts.dart';
@@ -209,13 +207,13 @@ class DraggableSheetState extends State<DraggableSheet> {
                                     const SizedBox(height: 10),
                                     InfoBarClickable(
                                       function: () {
-                                        MapModel().openNavigationURL(
-                                          'waze',
-                                          widget.currentLat,
-                                          widget.currentLong,
-                                          widget.lat,
-                                          widget.long,
-                                        );
+                                        // MapModel().openNavigationURL(
+                                        //   'waze',
+                                        //   widget.currentLat,
+                                        //   widget.currentLong,
+                                        //   widget.lat,
+                                        //   widget.long,
+                                        // );
                                       },
                                       textDisplay: 'Go to Location using Waze',
                                       icon: SimpleIcons.waze,
@@ -226,13 +224,13 @@ class DraggableSheetState extends State<DraggableSheet> {
                                     const SizedBox(height: 10),
                                     InfoBarClickable(
                                       function: () {
-                                        MapModel().openNavigationURL(
-                                          'googlemaps',
-                                          widget.currentLat,
-                                          widget.currentLong,
-                                          widget.lat,
-                                          widget.long,
-                                        );
+                                        // MapModel().openNavigationURL(
+                                        //   'googlemaps',
+                                        //   widget.currentLat,
+                                        //   widget.currentLong,
+                                        //   widget.lat,
+                                        //   widget.long,
+                                        // );
                                       },
                                       textDisplay:
                                           'Go to Location using Google Maps',

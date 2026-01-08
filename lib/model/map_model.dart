@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'dart:math' show cos, sqrt, asin;
 import 'package:intl/intl.dart';
 import 'package:soleh/shared/component/dialogs.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MapModel {
   LatLng defaultLatLng = const LatLng(3.14, 101.69);
@@ -58,13 +59,16 @@ class MapModel {
   }
 
   void onTapMarker(LatLng point) {
-    onTapMarkerPinList.remove(onTapMarkerPin);
+    onTapMarkerPinList.clear();
     onTapMarkerPin = Marker(
       point: LatLng(point.latitude, point.longitude),
-      child: const Icon(
-        size: 40,
-        Icons.location_on,
-        color: Color.fromARGB(255, 220, 64, 61),
+      child: Transform.translate(
+        offset: const Offset(-5, -20),
+        child: const Icon(
+          size: 40,
+          Icons.location_on,
+          color: Color.fromARGB(255, 220, 64, 61),
+        ),
       ),
     );
     onTapMarkerPinList.add(onTapMarkerPin);
@@ -127,14 +131,7 @@ class MapModel {
     var candidates = json['candidates'] as List<dynamic>;
     if (candidates.isNotEmpty) {
       var placeId = candidates[0]['place_id'] as String;
-      // ignore: unnecessary_null_comparison
-      if (placeId != null) {
-        return placeId;
-      } else {
-        if (kDebugMode) {
-          // print('placeId is null');
-        }
-      }
+      return placeId;
     } else {
       if (kDebugMode) {
         // print('No candidates found $candidates');
@@ -194,28 +191,26 @@ class MapModel {
   Future<void> getMosqueMarker(
       MosqueMarkerProvider mosqueMarkerProvider) async {
     try {
-      String jsonString =
-          await rootBundle.loadString('assets/datasets/senarai_masjid.json');
-      var data = jsonDecode(jsonString);
+      final supabase = Supabase.instance.client;
 
-      if (data is List) {
-        for (var point in data) {
-          Marker marker = Marker(
-            key: Key(point['refid'].toString()),
-            width: 40.0,
-            height: 40.0,
-            point: LatLng(point['lat'], point['lng']),
-            child: Image.asset('assets/images/mosque_marker.png'),
-          );
-          markerList.add(marker);
-          markerListInfo.add(point);
-        }
-        print('Cluster markers count: ${markerList.length}');
-        markerListFlag = true;
-        mosqueMarkerProvider.updateMarkers(markerList);
-        mosqueMarkerProvider.updateMarkersInfo(markerListInfo);
-        mosqueMarkerProvider.updateMarkersFlag(markerListFlag);
+      List<Map<String, dynamic>> data = await supabase.from('mosques').select();
+
+      for (var point in data) {
+        Marker marker = Marker(
+          key: Key(point['refid'].toString()),
+          width: 40.0,
+          height: 40.0,
+          point: LatLng(point['lat'], point['lng']),
+          child: Image.asset('assets/images/mosque_marker.png'),
+        );
+        markerList.add(marker);
+        markerListInfo.add(point);
       }
+      print('Cluster markers count: ${markerList.length}');
+      markerListFlag = true;
+      mosqueMarkerProvider.updateMarkers(markerList);
+      mosqueMarkerProvider.updateMarkersInfo(markerListInfo);
+      mosqueMarkerProvider.updateMarkersFlag(markerListFlag);
     } catch (e) {
       // Handle error
       print('Error: $e');

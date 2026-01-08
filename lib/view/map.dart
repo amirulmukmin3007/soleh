@@ -106,6 +106,7 @@ class _MosqueMapState extends State<MosqueMap> {
                 ),
                 MarkerClusterLayerWidget(
                   options: MarkerClusterLayerOptions(
+                    showPolygon: false,
                     markers: mosqueMarkerProvider.markers,
                     maxClusterRadius: 100,
                     size: const Size(40, 40),

@@ -49,11 +49,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'title': 'Masjid',
       'route': '/menu',
     },
-    {
-      'icon': FlutterIslamicIcons.solidZakat,
-      'title': 'Zakat',
-      'route': '/menu',
-    },
   ];
 
   @override
@@ -198,12 +193,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ShimmerBox(height: 200, width: double.infinity),
                     const SizedBox(height: 10),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ShimmerBox(height: 100, width: 60),
-                        const SizedBox(width: 10),
-                        ShimmerBox(height: 100, width: 60),
-                        const SizedBox(width: 10),
                         ShimmerBox(height: 100, width: 60),
                       ],
                     ),
@@ -268,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         children: menus.map((item) {
                           return Padding(
                             padding: const EdgeInsets.all(5.0),
-                            child: MenuBox2(
+                            child: MenuBox(
                               icon: item['icon'],
                               label: item['title'],
                             ),

@@ -9,10 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  accordion: ^2.6.0
-  animated_bottom_navigation_bar: ^1.3.3
   bloc: ^9.0.1
-  cupertino_icons: ^1.0.2
+  dependency_validator: ^5.0.3
+  device_preview: ^1.3.1
   flutter_bloc: ^9.1.1
   fluentui_system_icons: ^1.1.229
   flutter_dotenv: ^6.0.0
@@ -25,23 +24,15 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   geolocator: ^14.0.2
   google_fonts: ^6.2.1
-  google_maps_flutter: ^2.6.0
-  hive: ^2.2.3
   html: ^0.15.6
   http: ^1.2.1
   latlong2: ^0.9.0
   location: ^8.0.1
   material_symbols_icons: ^4.2780.0
-  persistent_bottom_nav_bar_v2: ^6.1.0
   provider: ^6.1.2
-  rive: ^0.13.20
   simple_icons: ^14.6.1
   shimmer: ^3.0.0
-  sliding_clipped_nav_bar: ^3.1.1
   supabase_flutter: ^2.10.3
-  timezone: ^0.10.1
-  unicons: ^3.0.0
-  url_launcher: ^6.3.1
   intl: ^0.20.2
 
 dev_dependencies:

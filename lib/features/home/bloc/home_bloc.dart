@@ -27,13 +27,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(HomeLoading());
 
     try {
-      // Get location
       geo.Position locationData = await repository.getLiveLocation();
 
       double lat = locationData.latitude;
       double lng = locationData.longitude;
 
-      // Get all data from repository
       String locationName = await repository.getLocationName(lat, lng);
       Map<String, String> hijrahData = await repository.getHijrahDate();
       Map<String, String> prayerTimesData =
@@ -42,7 +40,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       Map<String, dynamic> zikirData = await repository.getZikirDaily();
       String dayPicture = repository.getDayPicture();
 
-      // Create models
       final prayerTimesModel = PrayerTimesModel(
         subuh: prayerTimesData['subuh'] ?? '',
         syuruk: prayerTimesData['syuruk'] ?? '',
