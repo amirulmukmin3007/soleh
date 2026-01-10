@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 
 class ShimmerLoad extends StatelessWidget {
   const ShimmerLoad({super.key, required this.height, required this.width});
@@ -26,12 +25,14 @@ class ShimmerBox extends StatefulWidget {
   final double width;
   final double height;
   final double borderRadius;
+  EdgeInsets? margin;
 
-  const ShimmerBox({
+  ShimmerBox({
     super.key,
     required this.width,
     required this.height,
     this.borderRadius = 8,
+    this.margin = const EdgeInsets.all(0),
   });
 
   @override
@@ -69,6 +70,7 @@ class _ShimmerBoxState extends State<ShimmerBox>
       animation: _animation,
       builder: (context, child) {
         return Container(
+          margin: widget.margin,
           width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(

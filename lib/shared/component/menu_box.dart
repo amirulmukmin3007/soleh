@@ -68,7 +68,7 @@ class _MenuBox2State extends State<MenuBox2>
             gradient: LinearGradient(
               colors: [
                 ColorTheme.primary,
-                ColorTheme.primary.withValues(alpha: 0.5),
+                ColorTheme.primary.withValues(alpha: 0.7),
               ],
               begin: Alignment.centerLeft,
               end: Alignment.topRight,

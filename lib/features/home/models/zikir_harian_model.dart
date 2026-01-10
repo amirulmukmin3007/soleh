@@ -10,4 +10,22 @@ class ZikirHarianModel {
     required this.day,
     required this.dayName,
   });
+
+  factory ZikirHarianModel.fromJson(Map<String, dynamic> json) {
+    return ZikirHarianModel(
+      title: json['title'],
+      imageUrl: json['imageUrl'],
+      day: json['day'],
+      dayName: json['dayName'],
+    );
+  }
+
+  factory ZikirHarianModel.setNull() {
+    return ZikirHarianModel(
+      title: '',
+      imageUrl: '',
+      day: 0,
+      dayName: '',
+    );
+  }
 }

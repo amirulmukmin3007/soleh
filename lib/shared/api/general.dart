@@ -17,3 +17,4 @@ String jakimDuration =
 String aladhan = 'http://api.aladhan.com/v1/';
 String dateSearch = 'gToH/';
 String asmaUlHusnaSearch = 'asmaAlHusna/';
+String zikirHarianUrl = "https://akuislam.com/panduan/zikir-harian-rumi/";

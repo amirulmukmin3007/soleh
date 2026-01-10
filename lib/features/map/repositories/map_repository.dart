@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:soleh/features/map/models/mosque.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math' show cos, sqrt, asin;
@@ -37,6 +38,22 @@ class MapRepository {
   List<Marker> markerList = [];
   List<Map<String, dynamic>> markerListInfo = [];
   bool markerListFlag = false;
+
+  Future<MosqueListModel> getMosqueMarkers() async {
+    try {
+      final supabase = Supabase.instance.client;
+
+      List<Map<String, dynamic>> data = await supabase.from('mosques').select();
+      List<MosqueModel> mosques = data.map((json) {
+        return MosqueModel.fromJson(json);
+      }).toList();
+
+      return MosqueListModel(mosques: mosques);
+    } catch (e) {
+      print('Error fetching mosques: $e');
+      return MosqueListModel(mosques: []);
+    }
+  }
 
   void goToMyLocation(BuildContext context, MapController mapController,
       double? myLat, double? myLong) {
@@ -185,20 +202,6 @@ class MapRepository {
       }
     }
     return null;
-  }
-
-  Future<List<Map<String, dynamic>>> getMosqueMarker() async {
-    try {
-      final supabase = Supabase.instance.client;
-
-      List<Map<String, dynamic>> data = await supabase.from('mosques').select();
-
-      return data;
-    } catch (e) {
-      // Handle error
-      print('Error: $e');
-      return [];
-    }
   }
 
   String calculateDistance(lat1, lon1, lat2, lon2) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:soleh/features/home/screens/home.dart';
+import 'package:soleh/features/map/screens/map.dart';
 import 'package:soleh/themes/colors.dart';
-import 'package:soleh/view/map.dart';
 import 'package:soleh/view/qibla.dart';
 import 'package:soleh/view/settings.dart';
 
@@ -136,7 +136,7 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
           // Home(isActive: pageFlags[0]),
           HomeScreen(),
           Qibla(isActive: pageFlags[1]),
-          MosqueMap(isActive: pageFlags[2]),
+          MapScreen(isActive: pageFlags[2]),
           Placeholder(),
           Settings(isActive: pageFlags[4]),
         ],

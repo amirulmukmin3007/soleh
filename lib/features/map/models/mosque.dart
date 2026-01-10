@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class MosqueModel {
   String name;
@@ -24,6 +26,27 @@ class MosqueModel {
     required this.lng,
     required this.marker,
   });
+
+  factory MosqueModel.fromJson(Map<String, dynamic> json) {
+    return MosqueModel(
+      name: json['name'],
+      place: json['place'],
+      address: json['address'],
+      postcode: json['postcode'],
+      district: json['district'],
+      noTel: json['no_tel'],
+      noFax: json['no_fax'],
+      lat: json['lat'],
+      lng: json['lng'],
+      marker: Marker(
+        key: Key(json['refid'].toString()),
+        width: 40.0,
+        height: 40.0,
+        point: LatLng(json['lat'], json['lng']),
+        child: Image.asset('assets/images/mosque_marker.png'),
+      ),
+    );
+  }
 }
 
 class MosqueListModel {

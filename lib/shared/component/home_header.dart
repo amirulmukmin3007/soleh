@@ -1,20 +1,19 @@
+import 'dart:async';
+
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:soleh/shared/component/shimmer.dart';
+import 'package:soleh/shared/functions/formatter.dart';
 import 'package:soleh/themes/colors.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
     super.key,
-    required this.currentTime,
-    required this.currentMeridiem,
     required this.currentHijrahDate,
     required this.currentLocation,
   });
 
-  final String currentTime;
-  final String currentMeridiem;
   final String currentHijrahDate;
   final String currentLocation;
 
@@ -39,10 +38,8 @@ class HomeHeader extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                currentLocation == ''
+                const SizedBox(height: 20),
+                currentLocation.isEmpty
                     ? const ShimmerLoad(height: 20, width: 50)
                     : Row(
                         children: [
@@ -65,29 +62,8 @@ class HomeHeader extends StatelessWidget {
                       ),
                 Row(
                   children: [
-                    currentTime == ''
-                        ? const ShimmerLoad(height: 50, width: 80)
-                        : Text(
-                            currentTime,
-                            style: TextStyle(
-                              fontFamily: GoogleFonts.staatliches().fontFamily,
-                              fontSize: 55,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                    const SizedBox(width: 5),
-                    currentMeridiem == ''
-                        ? const ShimmerLoad(height: 10, width: 30)
-                        : Text(
-                            currentMeridiem,
-                            style: TextStyle(
-                              fontFamily: GoogleFonts.montserrat().fontFamily,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                    // Use TimeDisplay widget instead of state values
+                    const TimeDisplay(),
                     const SizedBox(width: 20),
                     Container(
                       width: 10,
@@ -95,7 +71,7 @@ class HomeHeader extends StatelessWidget {
                       color: Colors.white,
                     ),
                     const SizedBox(width: 20),
-                    currentHijrahDate == ''
+                    currentHijrahDate.isEmpty
                         ? const ShimmerLoad(height: 20, width: 100)
                         : Text(
                             currentHijrahDate,
@@ -110,13 +86,73 @@ class HomeHeader extends StatelessWidget {
                 ),
               ],
             ),
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [],
-            )
           ],
         ),
       ),
+    );
+  }
+}
+
+class TimeDisplay extends StatefulWidget {
+  const TimeDisplay({super.key});
+
+  @override
+  State<TimeDisplay> createState() => _TimeDisplayState();
+}
+
+class _TimeDisplayState extends State<TimeDisplay> {
+  final Formatter formatter = Formatter();
+  late String currentTime;
+  late String currentMeridiem;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateTime();
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _updateTime(),
+    );
+  }
+
+  void _updateTime() {
+    setState(() {
+      currentTime = formatter.getTime();
+      currentMeridiem = formatter.getMeridiem();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          currentTime,
+          style: TextStyle(
+            fontFamily: GoogleFonts.staatliches().fontFamily,
+            fontSize: 55,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(width: 5),
+        Text(
+          currentMeridiem,
+          style: TextStyle(
+            fontFamily: GoogleFonts.montserrat().fontFamily,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ],
     );
   }
 }

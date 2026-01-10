@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:http/http.dart' as http;
+import 'package:soleh/features/home/models/asma_ul_husna.dart';
+import 'package:soleh/features/home/models/hijrah_date.dart';
+import 'package:soleh/features/home/models/prayer_times.dart';
+import 'package:soleh/features/home/models/zikir_harian_model.dart';
 import 'package:soleh/shared/api/general.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/functions/formatter.dart';
@@ -36,7 +40,7 @@ class HomeRepository {
     }
   }
 
-  Future<Map<String, String>> getHijrahDate() async {
+  Future<HijrahDateModel> getHijrahDate() async {
     try {
       String setDate = formatter.getCurrentDateFormattedAPI();
       final response = await http.get(
@@ -54,19 +58,21 @@ class HomeRepository {
             holiday = data['data']['hijri']['holidays'][0];
           }
 
-          return {
+          final mappedData = {
             'holiday': holiday,
             'currentDate': setDate,
             'currentDay': "$dayAR, $dayEN",
             'currentHijrahDate':
                 "${data['data']['hijri']['day']} ${data['data']['hijri']['month']['en']} ${data['data']['hijri']['year']}",
           };
+
+          return HijrahDateModel.fromJson(mappedData);
         }
       }
     } catch (e) {
       print('Error in getHijrahDate: $e');
     }
-    return {};
+    return HijrahDateModel.setNull();
   }
 
   Future<String> getLocationName(double latitude, double longitude) async {
@@ -96,7 +102,7 @@ class HomeRepository {
     return '';
   }
 
-  Future<Map<String, String>> getPrayerTimes(double lat, double lng) async {
+  Future<PrayerTimesModel> getPrayerTimes(double lat, double lng) async {
     try {
       DateTime now = DateTime.now();
       String date = now.toString().split(' ')[0];
@@ -116,7 +122,7 @@ class HomeRepository {
 
           if (jakimResponse.statusCode == 200) {
             final jakimJson = jsonDecode(jakimResponse.body);
-            return {
+            final mappedData = {
               'subuh':
                   formatter.trimSeconds(jakimJson['prayerTime'][0]['fajr']),
               'syuruk':
@@ -129,16 +135,17 @@ class HomeRepository {
               'isyak':
                   formatter.trimSeconds(jakimJson['prayerTime'][0]['isha']),
             };
+            return PrayerTimesModel.fromJson(mappedData);
           }
         }
       }
     } catch (e) {
       print('Error in getPrayerTimes: $e');
     }
-    return {};
+    return PrayerTimesModel.setNull();
   }
 
-  Future<Map<String, String>> getAsmaUlHusna() async {
+  Future<AsmaUlHusnaModel> getAsmaUlHusna() async {
     try {
       Random random = Random();
       int randomNumber = random.nextInt(99) + 1;
@@ -149,17 +156,18 @@ class HomeRepository {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        return {
+        final mappedData = {
           'meaning': data['data'][0]['en']['meaning'] ?? '',
           'ar': data['data'][0]['name'] ?? '',
           'en': data['data'][0]['transliteration'] ?? '',
           'num': (data['data'][0]['number'] ?? 0).toString(),
         };
+        return AsmaUlHusnaModel.fromJson(mappedData);
       }
     } catch (e) {
       print('Error in getAsmaUlHusna: $e');
     }
-    return {};
+    return AsmaUlHusnaModel.setNull();
   }
 
   String getDayPicture() {
@@ -170,60 +178,49 @@ class HomeRepository {
     return 'assets/images/night_time.jpg';
   }
 
-  Future<Map<String, dynamic>> getZikirDaily() async {
+  Future<ZikirHarianModel> getZikirDaily() async {
     try {
       final response = await http.get(
-        Uri.parse("https://akuislam.com/panduan/zikir-harian-rumi/"),
+        Uri.parse(zikirHarianUrl),
       );
 
       if (response.statusCode != 200) {
         print('Failed to load page: ${response.statusCode}');
-        return {};
+        return ZikirHarianModel.setNull();
       }
 
-      // Parse HTML
       final document = html_parser.parse(response.body);
 
-      // Map of day names to their index (1 = Monday, 7 = Sunday)
       final dayMap = {
-        'isnin': 1, // Monday
-        'selasa': 2, // Tuesday
-        'rabu': 3, // Wednesday
-        'khamis': 4, // Thursday
-        'jumaat': 5, // Friday
-        'sabtu': 6, // Saturday
-        'ahad': 7, // Sunday
+        'isnin': 1,
+        'selasa': 2,
+        'rabu': 3,
+        'khamis': 4,
+        'jumaat': 5,
+        'sabtu': 6,
+        'ahad': 7,
       };
 
-      // Get current day (1 = Monday, 7 = Sunday)
       final today = DateTime.now().weekday;
 
-      // Find all h3 headers with ids starting with "h-zikir-hari-"
       final headers = document.querySelectorAll('h3[id^="h-zikir-hari-"]');
 
       for (var header in headers) {
         try {
           final id = header.attributes['id'] ?? '';
 
-          // Extract day name from id (e.g., "h-zikir-hari-isnin" -> "isnin")
           final dayName = id.replaceAll('h-zikir-hari-', '');
 
           if (!dayMap.containsKey(dayName)) continue;
 
-          // Check if this is today's zikir
           if (dayMap[dayName] == today) {
-            // Get the title text
             final title = header.text.trim();
 
-            // Find image by matching the title attribute with day name
             String? imageUrl;
 
-            // Search for image with title containing the day name
             final allImages = document.querySelectorAll('img[data-src]');
             for (var img in allImages) {
               final imgTitle = img.attributes['title'] ?? '';
-              // Check if title contains "zikir-" followed by the day name
-              // e.g., "zikir-isnin@2x", "zikir-hari-selasa@2x", etc.
               if (imgTitle.contains('zikir') &&
                   (imgTitle.contains(dayName) ||
                       imgTitle.contains('hari-$dayName'))) {
@@ -234,23 +231,24 @@ class HomeRepository {
 
             print('Image URL: $imageUrl');
 
-            // Return today's zikir immediately
-            return {
+            final mappedData = {
               'title': title,
               'imageUrl': imageUrl ?? '',
               'day': dayMap[dayName],
               'dayName': dayName,
             };
+
+            return ZikirHarianModel.fromJson(mappedData);
           }
         } catch (e) {
           print('Error parsing item: $e');
         }
       }
 
-      return {};
+      return ZikirHarianModel.setNull();
     } catch (e) {
       print('Error in getZikirDaily: $e');
-      return {};
+      return ZikirHarianModel.setNull();
     }
   }
 

@@ -14,16 +14,63 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final HomeRepository repository;
   final Formatter formatter = Formatter();
+  Timer? _timer;
 
   HomeBloc({required this.repository}) : super(HomeInitial()) {
-    on<HomeInitialEvent>(loadAllData);
-    on<HomeRefreshDataEvent>(loadAllData);
+    on<HomeInitialEvent>(onInitial);
+    on<HomeRefreshDataEvent>(onRefresh);
+    on<HomeUpdateTimeEvent>(onUpdateTime);
   }
 
-  Future<void> loadAllData(
-    HomeEvent event,
+  Future<void> onInitial(
+    HomeInitialEvent event,
     Emitter<HomeState> emit,
   ) async {
+    await _loadAllData(emit);
+    _startTimer();
+  }
+
+  Future<void> onRefresh(
+    HomeRefreshDataEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    await _loadAllData(emit);
+  }
+
+  void onUpdateTime(
+    HomeUpdateTimeEvent event,
+    Emitter<HomeState> emit,
+  ) {
+    if (state is HomeLoaded) {
+      final currentState = state as HomeLoaded;
+
+      String currentWaktuSolat = _calculateCurrentWaktuSolat(
+        currentState.prayerTimes,
+      );
+
+      if (currentWaktuSolat != currentState.currentWaktuSolat) {
+        emit(HomeLoaded(
+          hijrahDate: currentState.hijrahDate,
+          locationName: currentState.locationName,
+          prayerTimes: currentState.prayerTimes,
+          asmaUlHusna: currentState.asmaUlHusna,
+          dayPicture: currentState.dayPicture,
+          currentWaktuSolat: currentWaktuSolat,
+          zikirHarian: currentState.zikirHarian,
+        ));
+      }
+    }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => add(HomeUpdateTimeEvent()),
+    );
+  }
+
+  Future<void> _loadAllData(Emitter<HomeState> emit) async {
     emit(HomeLoading());
 
     try {
@@ -33,44 +80,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       double lng = locationData.longitude;
 
       String locationName = await repository.getLocationName(lat, lng);
-      Map<String, String> hijrahData = await repository.getHijrahDate();
-      Map<String, String> prayerTimesData =
+      HijrahDateModel hijrahDateModel = await repository.getHijrahDate();
+      PrayerTimesModel prayerTimesModel =
           await repository.getPrayerTimes(lat, lng);
-      Map<String, String> asmaUlHusnaData = await repository.getAsmaUlHusna();
-      Map<String, dynamic> zikirData = await repository.getZikirDaily();
+      AsmaUlHusnaModel asmaUlHusnaModel = await repository.getAsmaUlHusna();
+      ZikirHarianModel zikirHarianModel = await repository.getZikirDaily();
       String dayPicture = repository.getDayPicture();
 
-      final prayerTimesModel = PrayerTimesModel(
-        subuh: prayerTimesData['subuh'] ?? '',
-        syuruk: prayerTimesData['syuruk'] ?? '',
-        zohor: prayerTimesData['zohor'] ?? '',
-        asar: prayerTimesData['asar'] ?? '',
-        maghrib: prayerTimesData['maghrib'] ?? '',
-        isyak: prayerTimesData['isyak'] ?? '',
-      );
-
-      final asmaUlHusnaModel = AsmaUlHusnaModel(
-        auhMeaning: asmaUlHusnaData['meaning'] ?? '',
-        auhAR: asmaUlHusnaData['ar'] ?? '',
-        auhEN: asmaUlHusnaData['en'] ?? '',
-        auhNum: asmaUlHusnaData['num'] ?? '',
-      );
-
-      final hijrahDateModel = HijrahDateModel(
-        holiday: hijrahData['holiday'] ?? '',
-        currentDate: hijrahData['currentDate'] ?? '',
-        currentDay: hijrahData['currentDay'] ?? '',
-        currentHijrahDate: hijrahData['currentHijrahDate'] ?? '',
-      );
-
-      final zikirHarianModel = ZikirHarianModel(
-        title: zikirData['title'] ?? '',
-        imageUrl: zikirData['imageUrl'] ?? '',
-        day: zikirData['day'] ?? '',
-        dayName: zikirData['dayName'] ?? '',
-      );
-
       String currentWaktuSolat = _calculateCurrentWaktuSolat(prayerTimesModel);
+
       emit(HomeLoaded(
         hijrahDate: hijrahDateModel,
         locationName: locationName,
@@ -87,7 +105,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   String _calculateCurrentWaktuSolat(PrayerTimesModel prayerTimes) {
-    // Business logic here
     List<String> times = [
       prayerTimes.subuh,
       prayerTimes.syuruk,
@@ -105,5 +122,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       'Isyak'
     ];
     return formatter.getCurrentWaktuSolat(times, labels);
+  }
+
+  @override
+  Future<void> close() {
+    _timer?.cancel();
+    return super.close();
   }
 }

@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_islamic_icons/flutter_islamic_icons.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:soleh/features/home/bloc/home_bloc.dart';
 import 'package:soleh/shared/component/asmaulhusna_card.dart';
 import 'package:soleh/shared/component/home_header.dart';
@@ -28,10 +26,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<Offset> _slideAnimation;
 
   Formatter formatter = Formatter();
-  String currentTime = '';
-  String currentMeridiem = '';
-  Timer? timer;
-  Timer? minuteTimer;
 
   List<Map<String, dynamic>> menus = [
     {
@@ -60,9 +54,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    currentTime = formatter.getTime();
-    currentMeridiem = formatter.getMeridiem();
-
     _fadeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -85,17 +76,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     ));
 
     context.read<HomeBloc>().add(HomeInitialEvent());
-
-    // Update time every second
-    timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        setState(() {
-          currentTime = formatter.getTime();
-          currentMeridiem = formatter.getMeridiem();
-        });
-      },
-    );
   }
 
   Widget _buildAnimatedCard({required Widget child, required int index}) {
@@ -116,28 +96,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _shimmerAzanCard() {
     return Container(
-      padding: const EdgeInsets.all(20),
-      child: Shimmer(
-        gradient: const LinearGradient(
-          colors: [Colors.white, Colors.white70],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        child: Container(
-          height: 60,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.white.withValues(alpha: 0.3),
-          ),
-        ),
-      ),
-    );
+        padding: const EdgeInsets.all(20),
+        child: ShimmerBox(width: double.infinity, height: 200));
   }
 
   @override
   void dispose() {
-    timer?.cancel();
-    minuteTimer?.cancel();
     _fadeAnimationController.dispose();
     super.dispose();
   }
@@ -161,20 +125,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             } else {
               return Container(
                 padding: const EdgeInsets.all(20),
-                child: Shimmer(
-                  gradient: const LinearGradient(
-                    colors: [Colors.white, Colors.white70],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
-                  ),
-                ),
+                child: ShimmerBox(width: double.infinity, height: 200),
               );
             }
           },
@@ -194,21 +145,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 Column(
                   children: [
+                    Wrap(alignment: WrapAlignment.spaceEvenly, children: [
+                      ShimmerBox(
+                          height: 80, width: 80, margin: EdgeInsets.all(5)),
+                      ShimmerBox(
+                          height: 80, width: 80, margin: EdgeInsets.all(5)),
+                      ShimmerBox(
+                          height: 80, width: 80, margin: EdgeInsets.all(5)),
+                      ShimmerBox(
+                          height: 80, width: 80, margin: EdgeInsets.all(5)),
+                    ]),
                     const SizedBox(height: 10),
-                    ShimmerBox(height: 200, width: double.infinity),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ShimmerBox(height: 100, width: 60),
-                        const SizedBox(width: 10),
-                        ShimmerBox(height: 100, width: 60),
-                        const SizedBox(width: 10),
-                        ShimmerBox(height: 100, width: 60),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    ShimmerBox(height: 200, width: double.infinity),
+                    ShimmerBox(height: 150, width: double.infinity),
                     const SizedBox(height: 10),
                     ShimmerBox(height: 120, width: double.infinity),
                     const SizedBox(height: 10),
@@ -236,8 +184,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           HomeHeader(
             currentHijrahDate: state.hijrahDate.currentHijrahDate,
-            currentTime: currentTime,
-            currentMeridiem: currentMeridiem,
             currentLocation: state.locationName,
           ),
           Padding(
@@ -284,11 +230,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         auhAR: state.asmaUlHusna.auhAR,
                         auhEN: state.asmaUlHusna.auhEN,
                         auhNum: state.asmaUlHusna.auhNum,
-                        dayPicture: state.dayPicture, // Pass the day picture
+                        dayPicture: state.dayPicture,
                         onRefresh: () {
-                          // Reset animation
                           _fadeAnimationController.reset();
-                          // Refresh data
                           context.read<HomeBloc>().add(HomeRefreshDataEvent());
                         },
                       ),

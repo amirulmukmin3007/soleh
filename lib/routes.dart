@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:soleh/view/home.dart';
+import 'package:soleh/features/home/screens/home.dart';
 import 'package:soleh/view/map.dart';
 import 'package:soleh/view/qibla.dart';
 import 'package:soleh/view/settings.dart';
@@ -8,9 +8,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   final bool isActive = settings.arguments as bool? ?? false;
 
   switch (settings.name) {
-    case Home.routeName:
+    case HomeScreen.routeName:
       return MaterialPageRoute(
-        builder: (context) => Home(isActive: isActive),
+        builder: (context) => HomeScreen(),
       );
     case Qibla.routeName:
       return MaterialPageRoute(
@@ -26,7 +26,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     default:
       return MaterialPageRoute(
-        builder: (context) => Home(isActive: isActive),
+        builder: (context) => HomeScreen(),
       );
   }
 }

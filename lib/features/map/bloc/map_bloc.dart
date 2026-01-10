@@ -20,34 +20,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   Future<void> loadMap(MapInitialEvent event, Emitter<MapState> emit) async {
     emit(MapLoading());
-    final mosques = await repository.getMosqueMarker();
 
-    MosqueModel mosqueModel;
-    MosqueListModel mosquesList =
-        MosqueListModel(mosques: []); // Initialize here
-
-    for (var mosque in mosques) {
-      mosqueModel = MosqueModel(
-        name: mosque['name'],
-        place: mosque['place'],
-        address: mosque['address'],
-        postcode: mosque['postcode'],
-        district: mosque['district'],
-        noTel: mosque['no_tel'],
-        noFax: mosque['no_fax'],
-        lat: mosque['lat'],
-        lng: mosque['lng'],
-        marker: Marker(
-          key: Key(mosque['refid'].toString()),
-          width: 40.0,
-          height: 40.0,
-          point: LatLng(mosque['lat'], mosque['lng']),
-          child: Image.asset('assets/images/mosque_marker.png'),
-        ),
-      );
-
-      mosquesList.mosques.add(mosqueModel);
-    }
+    final mosquesList = await repository.getMosqueMarkers();
 
     emit(MapLoaded(mosques: mosquesList));
   }

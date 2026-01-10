@@ -40,13 +40,13 @@ class ZikirDailyCard extends StatelessWidget {
                 const Icon(
                   Icons.auto_awesome,
                   color: Colors.white,
-                  size: 28,
+                  size: 14,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -59,7 +59,7 @@ class ZikirDailyCard extends StatelessWidget {
           // Image
           if (imageUrl.isNotEmpty)
             Container(
-              height: 200,
+              height: 70,
               decoration: const BoxDecoration(
                 color: Colors.white,
               ),
