@@ -44,6 +44,8 @@ class MapRepository {
       final supabase = Supabase.instance.client;
 
       List<Map<String, dynamic>> data = await supabase.from('mosques').select();
+      print('Cluster markers count: ${data.length}');
+
       List<MosqueModel> mosques = data.map((json) {
         return MosqueModel.fromJson(json);
       }).toList();

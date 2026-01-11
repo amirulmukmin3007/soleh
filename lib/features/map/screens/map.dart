@@ -1,21 +1,23 @@
+import 'dart:developer';
+
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:location/location.dart';
-import 'package:soleh/model/map_model.dart';
-import 'package:soleh/model/home_model.dart';
-import 'package:soleh/provider/location_provider.dart';
-import 'package:soleh/provider/mosque_marker_provider.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:soleh/features/home/bloc/home_bloc.dart';
+import 'package:soleh/features/map/bloc/map_bloc.dart';
+import 'package:soleh/features/map/config/draggable_sheet.dart';
+import 'package:soleh/features/map/models/mosque.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/component/clustercircle.dart';
 import 'package:soleh/shared/component/draggablebottomsheet.dart';
 import 'package:soleh/shared/component/searchbar.dart';
 import 'package:soleh/shared/functions/formatter.dart';
-import 'package:soleh/shared/functions/leaflet.dart';
 import 'package:soleh/themes/colors.dart';
 import 'package:soleh/themes/fonts.dart';
 
@@ -30,38 +32,101 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late Formatter formatter;
+  late DraggableSheetConfig draggableSheetConfig;
   FocusNode focusNode = FocusNode();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController searchBarMapController = TextEditingController();
+  DraggableScrollableController sheetController =
+      DraggableScrollableController();
+  MapController mapController = MapController();
+  MosqueModel selectedMosque = MosqueModel.setNull();
+  String currentDistance = '0.00';
+  LatLng currentLocation = LatLng(0, 0);
 
   @override
   void initState() {
     super.initState();
     formatter = Formatter();
+    draggableSheetConfig = DraggableSheetConfig();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    focusNode.dispose();
+    searchBarMapController.dispose();
+    if (kDebugMode) {
+      log('Map is Inactive');
+    }
+  }
+
+  @override
+  void didUpdateWidget(MapScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!oldWidget.isActive && widget.isActive) {
+      if (kDebugMode) {
+        log('Map is Active');
+      }
+      _onActive();
+    }
+  }
+
+  void _onActive() {
+    context.read<MapBloc>().add(MapInitialEvent());
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocListener<HomeBloc, HomeState>(
+      listener: (context, state) {
+        if (state is HomeLoaded) {
+          context.read<MapBloc>().add(MapUpdateUserLocationEvent(
+              lat: state.userLatitude, lng: state.userLongitude));
+        }
+      },
+      child: BlocConsumer<MapBloc, MapState>(
+        listener: (BuildContext context, MapState state) {
+          if (state is MapMarkerTapped) {
+            draggableSheetConfig.expandSheet(sheetController);
+          }
+          if (state is MapTapped) {
+            draggableSheetConfig.collapseSheet(sheetController);
+          }
+        },
+        builder: (BuildContext context, MapState state) {
+          if (state is MapMarkerTapped) {
+            currentDistance = state.distance;
+            currentLocation = state.userLocation;
+            selectedMosque = state.mosque;
+          }
+          if (state is MapTapped) {
+            selectedMosque = MosqueModel.setNull();
+          }
+
+          return _displayMap(context, state);
+        },
+      ),
+    );
+  }
+
+  Widget _displayMap(BuildContext context, MapState state) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
-        onTap: () {
-          setState(() {});
-        },
+        onTap: () {},
         child: Stack(
           children: [
             FlutterMap(
-              // mapController: mapController,
+              mapController: mapController,
               options: MapOptions(
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
                 ),
                 initialZoom: 7,
-                // initialCenter: mapModel.defaultLatLng,
+                initialCenter: LatLng(3.14, 101.69),
                 onTap: (tapPosition, point) {
-                  setState(() {
-                    // mapModel.onTapMarker(point);
-                  });
+                  context.read<MapBloc>().add(MapTapEvent(point: point));
                 },
               ),
               children: [
@@ -76,50 +141,45 @@ class _MapScreenState extends State<MapScreen> {
                     markerSize: Size(20, 20),
                   ),
                 ),
-                MarkerClusterLayerWidget(
-                  options: MarkerClusterLayerOptions(
-                    showPolygon: false,
-                    // markers: mosqueMarkerProvider.markers,
-                    maxClusterRadius: 100,
-                    size: const Size(40, 40),
-                    polygonOptions: const PolygonOptions(
-                      borderColor: Colors.transparent,
-                      color: Colors.black12,
-                      borderStrokeWidth: 3,
-                    ),
-                    builder: (context, markers) => ClusterCircle(
-                      numericValue: markers.length.toString(),
-                    ),
-                    onMarkerTap: (marker) {
-                      setState(() {
-                        // onMarkerTapDraggableSheet(marker);
-                      });
-
-                      // Wait for the widget to rebuild before expanding sheet
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        // _expandDraggableSheet();
-                      });
-                    },
+                if (state is MapLoading)
+                  const Center(child: CircularProgressIndicator()),
+                if (state is MapLoaded)
+                  MarkerClusterLayerWidget(
+                    options: MarkerClusterLayerOptions(
+                        showPolygon: false,
+                        markers: state.mosques.markers,
+                        maxClusterRadius: 100,
+                        size: const Size(40, 40),
+                        polygonOptions: const PolygonOptions(
+                          borderColor: Colors.transparent,
+                          color: Colors.black12,
+                          borderStrokeWidth: 3,
+                        ),
+                        builder: (context, markers) => ClusterCircle(
+                              numericValue: markers.length.toString(),
+                            ),
+                        onMarkerTap: (marker) {
+                          String trimKey =
+                              (marker.key as ValueKey<String>).value;
+                          String finalKey =
+                              trimKey.replaceAll(RegExp(r"[<>'\[\]]"), '');
+                          context.read<MapBloc>().add(
+                                MapTapMarkerEvent(refId: finalKey),
+                              );
+                        }),
                   ),
-                ),
-                // MarkerLayer(
-                //   markers: mapModel.onTapMarkerPinList,
-                // ),
+                if (state is MapTapped)
+                  MarkerLayer(
+                    markers: state.pinList,
+                  ),
               ],
             ),
-            // DraggableSheet(
-            //   sheetController: mapModel.dragController,
-            //   place: placeDraggableSheet,
-            //   address: addressDraggableSheet,
-            //   mosqueFlag: mosqueMarkerFlag,
-            //   state: stateDraggableSheet,
-            //   poskod: poskodDraggableSheet,
-            //   lat: latitudeDraggableSheet,
-            //   long: longitudeDraggableSheet,
-            //   distance: distanceDraggableSheet,
-            //   currentLat: currentLatDraggableSheet,
-            //   currentLong: currentLngDraggableSheet,
-            // ),
+            MarkerInfoSheet(
+              sheetController: sheetController,
+              mosque: selectedMosque,
+              distance: currentDistance,
+              userLocation: currentLocation,
+            ),
             Visibility(
               // visible: searchBarMapFlag,
               visible: false,
@@ -278,6 +338,7 @@ class _MapScreenState extends State<MapScreen> {
                         child: const Icon(FluentIcons.my_location_20_filled),
                         onTap: () {
                           // _goToMyLocation();
+                          print(currentLocation);
                         },
                       ),
                       SpeedDialChild(
@@ -303,313 +364,4 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-
-  // Functions
-  // Future<void> callGetMosqueMarker() async {
-  //   await mapModel.getMosqueMarker(mosqueMarkerProvider);
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
-
-  // Future<void> callGetLiveLocation() async {
-  //   pinMyLocation = await homeModel.getLiveLocation(locationProvider);
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
-
-  // void onMarkerTapDraggableSheet(Marker marker) {
-  //   clearDraggableSheet();
-  //   String key = (marker.key as ValueKey<String>).value;
-  //   String refid = key.replaceAll(RegExp(r"[<>'\[\]]"), '');
-  //   Map<String, dynamic> result = {};
-
-  //   for (var element in mosqueMarkerProvider.markersInfo) {
-  //     if (element['refid'] == int.parse(refid)) {
-  //       result = element;
-  //     }
-  //   }
-
-  //   if (result.isNotEmpty) {
-  //     // Ensure that all required fields exist before using them
-  //     placeDraggableSheet = result['place'] ?? 'Unknown Place';
-  //     addressDraggableSheet = result['address'] ?? 'Unknown Address';
-  //     stateDraggableSheet = result['state'] ?? 'Unknown State';
-  //     poskodDraggableSheet = result['poskod']?.toString() ?? 'Unknown Postcode';
-  //     noTelDraggableSheet = result['no_tel'] ?? 'Unknown Phone';
-  //     latitudeDraggableSheet = result['lat']?.toString() ?? '0.0';
-  //     longitudeDraggableSheet = result['lng']?.toString() ?? '0.0';
-  //     currentLatDraggableSheet = locationProvider.currentLatitude.toString();
-  //     currentLngDraggableSheet = locationProvider.currentLongitude.toString();
-  //     mosqueMarkerFlag = true;
-
-  //     double lat1 = locationProvider.currentLatitude ?? mapModel.defaultLat;
-  //     double lon1 = locationProvider.currentLongitude ?? mapModel.defaultLng;
-
-  //     double lat2 = double.tryParse(latitudeDraggableSheet) ?? 0.0;
-  //     double lon2 = double.tryParse(longitudeDraggableSheet) ?? 0.0;
-
-  //     distanceDraggableSheet =
-  //         mapModel.calculateDistance(lat1, lon1, lat2, lon2);
-  //   }
-  // }
-
-  // void clearDraggableSheet() {
-  //   mosqueMarkerFlag = false;
-  //   placeDraggableSheet = '';
-  //   addressDraggableSheet = '';
-  //   stateDraggableSheet = '';
-  //   poskodDraggableSheet = '';
-  //   noTelDraggableSheet = '';
-  //   latitudeDraggableSheet = '';
-  //   longitudeDraggableSheet = '';
-  //   distanceDraggableSheet = '';
-  // }
-
-  // // Safe method to expand draggable sheet
-  // void _expandDraggableSheet() {
-  //   if (mounted && mapModel.dragController.isAttached) {
-  //     try {
-  //       mapModel.expandDraggableSheet();
-  //     } catch (e) {
-  //       // If it still fails, try again after a short delay
-  //       Future.delayed(const Duration(milliseconds: 100), () {
-  //         if (mounted && mapModel.dragController.isAttached) {
-  //           try {
-  //             mapModel.expandDraggableSheet();
-  //           } catch (e) {
-  //             if (kDebugMode) {
-  //               print('Failed to expand draggable sheet: $e');
-  //             }
-  //           }
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
-
-  // // Safe method to go to my location
-  // void _goToMyLocation() {
-  //   try {
-  //     mapModel.goToMyLocation(
-  //       context,
-  //       mapController,
-  //       pinMyLocation.latitude,
-  //       pinMyLocation.longitude,
-  //     );
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('Failed to go to my location: $e');
-  //     }
-  //   }
-  // }
-
-  // // Safe method to go to Malaysia view
-  // void _goToMalaysiaView() {
-  //   try {
-  //     // Add your Malaysia view logic here
-  //     mapController.move(mapModel.defaultLatLng, 7);
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('Failed to go to Malaysia view: $e');
-  //     }
-  //   }
-  // }
-
-  @override
-  void dispose() {
-    focusNode.dispose();
-    searchBarMapController.dispose();
-    super.dispose();
-  }
-
-  Widget _buildLoadingState() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(
-            color: ColorTheme.primary,
-            strokeWidth: 3,
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Searching...',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.wifi_off_rounded,
-                size: 48,
-                color: Colors.red.shade400,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'No Internet Connection',
-              style: TextStyle(
-                fontFamily: FontTheme().fontFamily,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Please check your connection and try again',
-              style: TextStyle(
-                fontFamily: FontTheme().fontFamily,
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  // Trigger rebuild to retry search
-                });
-              },
-              icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorTheme.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.location_searching_rounded,
-                size: 48,
-                color: Colors.grey.shade500,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'No Results Found',
-              style: TextStyle(
-                fontFamily: FontTheme().fontFamily,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              searchBarMapController.text.isEmpty
-                  ? 'Start typing to search for places'
-                  : 'Try a different search term',
-              style: TextStyle(
-                fontFamily: FontTheme().fontFamily,
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Widget _buildSearchResults(List<dynamic> data) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       // Results count header
-  //       Padding(
-  //         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-  //         child: Text(
-  //           '${data.length} result${data.length == 1 ? '' : 's'} found',
-  //           style: TextStyle(
-  //             fontFamily: FontTheme().fontFamily,
-  //             fontSize: 14,
-  //             color: Colors.grey.shade600,
-  //             fontWeight: FontWeight.w500,
-  //           ),
-  //         ),
-  //       ),
-
-  //       // Search results list
-  //       Expanded(
-  //         child: ListView.separated(
-  //           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-  //           itemCount: data.length,
-  //           separatorBuilder: (context, index) => const Divider(
-  //             height: 0.5,
-  //             thickness: 0.5,
-  //             color: Colors.grey,
-  //             indent: 48,
-  //           ),
-  //           itemBuilder: (context, index) {
-  //             return LocationListTile(
-  //               location: data[index],
-  //               press: (value) async {
-  //                 setState(() {
-  //                   // Filtering Location Name
-  //                   clearDraggableSheet();
-
-  //                   List<String> arrayLocationName =
-  //                       formatter.splitAddressAtFirstComma(value);
-  //                   placeDraggableSheet = arrayLocationName[0];
-  //                   addressDraggableSheet = arrayLocationName[1];
-
-  //                   searchBarMapFlag = false;
-  //                   focusNode.unfocus();
-  //                 });
-  //               },
-  //             );
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 }

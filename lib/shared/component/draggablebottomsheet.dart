@@ -1,7 +1,10 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
+import 'package:soleh/features/map/config/draggable_sheet.dart';
+import 'package:soleh/features/map/models/mosque.dart';
 import 'package:soleh/shared/component/infobar.dart';
 import 'package:soleh/themes/colors.dart';
 import 'package:soleh/themes/fonts.dart';
@@ -251,6 +254,241 @@ class DraggableSheetState extends State<DraggableSheet> {
                   ),
                 )
               : null,
+        );
+      },
+    );
+  }
+}
+
+class MarkerInfoSheet extends StatefulWidget {
+  const MarkerInfoSheet({
+    super.key,
+    required this.sheetController,
+    required this.mosque,
+    required this.distance,
+    required this.userLocation,
+  });
+
+  final DraggableScrollableController sheetController;
+  final MosqueModel mosque;
+  final String distance;
+  final LatLng userLocation;
+
+  @override
+  MarkerInfoSheetState createState() => MarkerInfoSheetState();
+}
+
+class MarkerInfoSheetState extends State<MarkerInfoSheet> {
+  late DraggableSheetConfig draggableSheetConfig;
+
+  @override
+  void initState() {
+    super.initState();
+    draggableSheetConfig = DraggableSheetConfig();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0,
+      maxChildSize: 0.6,
+      minChildSize: 0,
+      expand: true,
+      snap: true,
+      snapSizes: const [0.2],
+      controller: widget.sheetController,
+      builder: (BuildContext context, ScrollController scrollController) {
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                offset: const Offset(0, -2),
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: DefaultTabController(
+            length: 2,
+            child: CustomScrollView(
+              controller: scrollController,
+              physics: const ClampingScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 5,
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          widget.mosque.place,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: FontTheme().fontFamily,
+                          ),
+                        ),
+                        Text(
+                          "${widget.mosque.address}\n${widget.mosque.state}",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: FontTheme().fontFamily,
+                            color: Color.fromARGB(255, 170, 170, 170),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            const Icon(
+                              FluentIcons.vehicle_car_20_filled,
+                              color: Color.fromARGB(255, 120, 120, 120),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              "${widget.distance} km",
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 120, 120, 120),
+                                fontFamily: FontTheme().fontFamily,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                      ],
+                    ),
+                  ),
+                ),
+                SliverPersistentHeader(
+                  delegate: _StickyTabBarDelegate(
+                    TabBar(
+                      indicatorColor: ColorTheme.primary,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      labelColor: ColorTheme.primary,
+                      labelStyle: TextStyle(
+                        fontFamily: FontTheme().fontFamily,
+                      ),
+                      tabs: const [
+                        Tab(
+                            icon: Icon(FluentIcons.location_16_filled),
+                            text: "Mosque"),
+                        Tab(
+                            icon: Icon(FluentIcons.directions_16_filled),
+                            text: "Direction"),
+                      ],
+                    ),
+                  ),
+                  pinned: true,
+                ),
+                SliverFillRemaining(
+                  child: TabBarView(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 10),
+                                InfoBar(
+                                  label: 'Mosque',
+                                  textDisplay: widget.mosque.place,
+                                  icon: Symbols.mosque_rounded,
+                                ),
+                                Divider(
+                                  color: Colors.grey[200],
+                                ),
+                                const SizedBox(height: 10),
+                                InfoBar(
+                                  label: 'Postcode',
+                                  textDisplay: widget.mosque.postcode,
+                                  icon: FluentIcons.street_sign_20_regular,
+                                ),
+                                Divider(
+                                  color: Colors.grey[200],
+                                ),
+                                const SizedBox(height: 10),
+                                InfoBar(
+                                  label: 'Location',
+                                  textDisplay:
+                                      '${widget.mosque.lat.toString()}, ${widget.mosque.lng.toString()}',
+                                  icon: FluentIcons.location_arrow_16_regular,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              InfoBarClickable(
+                                function: () {
+                                  draggableSheetConfig.openNavigationURL(
+                                    'waze',
+                                    widget.userLocation.latitude.toString(),
+                                    widget.userLocation.longitude.toString(),
+                                    widget.mosque.lat.toString(),
+                                    widget.mosque.lng.toString(),
+                                  );
+                                },
+                                textDisplay: 'Go to Location using Waze',
+                                icon: SimpleIcons.waze,
+                                iconBackgroundColor:
+                                    const Color.fromARGB(255, 189, 239, 255),
+                                iconColor: const Color(0xFF33CCFF),
+                              ),
+                              const SizedBox(height: 10),
+                              InfoBarClickable(
+                                function: () {
+                                  draggableSheetConfig.openNavigationURL(
+                                    'googlemaps',
+                                    widget.userLocation.latitude.toString(),
+                                    widget.userLocation.longitude.toString(),
+                                    widget.mosque.lat.toString(),
+                                    widget.mosque.lng.toString(),
+                                  );
+                                },
+                                textDisplay: 'Go to Location using Google Maps',
+                                icon: SimpleIcons.googlemaps,
+                                iconBackgroundColor:
+                                    const Color.fromARGB(255, 208, 246, 208),
+                                iconColor:
+                                    const Color.fromARGB(255, 88, 167, 81),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );

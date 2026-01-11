@@ -54,7 +54,6 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    // Initialize controllers and animations for each tab
     _controllers = List.generate(
       _navItems.length,
       (index) => AnimationController(
@@ -86,15 +85,10 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
     if (currentPageIndex == index) return;
 
     setState(() {
-      // Reset previous animations
       _controllers[currentPageIndex].reverse();
-
-      // Start new animations
       _controllers[index].forward();
-
       currentPageIndex = index;
 
-      // Update active page flags
       for (int i = 0; i < pageFlags.length; i++) {
         pageFlags[i] = i == index;
       }

@@ -15,6 +15,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final HomeRepository repository;
   final Formatter formatter = Formatter();
   Timer? _timer;
+  double? userLatitude;
+  double? userLongitude;
 
   HomeBloc({required this.repository}) : super(HomeInitial()) {
     on<HomeInitialEvent>(onInitial);
@@ -57,6 +59,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           dayPicture: currentState.dayPicture,
           currentWaktuSolat: currentWaktuSolat,
           zikirHarian: currentState.zikirHarian,
+          userLatitude: userLatitude!,
+          userLongitude: userLongitude!,
         ));
       }
     }
@@ -75,6 +79,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     try {
       geo.Position locationData = await repository.getLiveLocation();
+
+      userLatitude = locationData.latitude;
+      userLongitude = locationData.longitude;
 
       double lat = locationData.latitude;
       double lng = locationData.longitude;
@@ -97,6 +104,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         dayPicture: dayPicture,
         currentWaktuSolat: currentWaktuSolat,
         zikirHarian: zikirHarianModel,
+        userLatitude: lat,
+        userLongitude: lng,
       ));
     } catch (e, stackTrace) {
       print('Stack trace: $stackTrace');

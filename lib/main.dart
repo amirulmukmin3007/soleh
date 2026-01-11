@@ -5,6 +5,8 @@ import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:provider/provider.dart';
 import 'package:soleh/features/home/bloc/home_bloc.dart';
 import 'package:soleh/features/home/repositories/home_repository.dart';
+import 'package:soleh/features/map/bloc/map_bloc.dart';
+import 'package:soleh/features/map/repositories/map_repository.dart';
 import 'package:soleh/provider/mosque_marker_provider.dart';
 import 'package:soleh/splashscreen.dart';
 import 'package:soleh/themes/fonts.dart';
@@ -36,7 +38,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -44,13 +45,16 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => HomeBloc(repository: HomeRepository()),
         ),
+        BlocProvider(
+          create: (context) => MapBloc(repository: MapRepository()),
+        ),
       ],
       child: MaterialApp(
         locale: DevicePreview.locale(context),
         builder: DevicePreview.appBuilder,
         theme: ThemeData(fontFamily: FontTheme().fontFamily),
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Soleh App',
         home: SplashScreen(),
       ),
     );
