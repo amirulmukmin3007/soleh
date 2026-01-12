@@ -2,12 +2,10 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
-import 'package:provider/provider.dart';
 import 'package:soleh/features/home/bloc/home_bloc.dart';
 import 'package:soleh/features/home/repositories/home_repository.dart';
 import 'package:soleh/features/map/bloc/map_bloc.dart';
 import 'package:soleh/features/map/repositories/map_repository.dart';
-import 'package:soleh/provider/mosque_marker_provider.dart';
 import 'package:soleh/splashscreen.dart';
 import 'package:soleh/themes/fonts.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -24,13 +22,7 @@ Future<void> main() async {
   runApp(
     DevicePreview(
       enabled: true,
-      builder: (context) => MultiProvider(
-        providers: [
-          ChangeNotifierProvider<MosqueMarkerProvider>(
-              create: (_) => MosqueMarkerProvider()),
-        ],
-        child: const MyApp(),
-      ),
+      builder: (context) => const MyApp(),
     ),
   );
 }
