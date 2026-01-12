@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:soleh/features/map/models/mosque.dart';
@@ -13,31 +12,14 @@ import 'package:soleh/shared/component/dialogs.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MapRepository {
-  LatLng defaultLatLng = const LatLng(3.14, 101.69);
-  double defaultLat = 3.1421764850803244;
-  double defaultLng = 101.69171438465744;
   String defaultMapTile =
       "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&key=$googleMapKey";
   String defaultMapTile2 =
       "https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=oJo1lsj89BZ6R7OTxTm1";
 
-  // On Tap State Management
-  late Marker onTapMarkerPin =
-      Marker(point: LatLng(defaultLat, defaultLng), child: Container());
-  late double onTapLat;
-  late double onTapLong;
-  late List<Marker> onTapMarkerPinList = [];
-  DraggableScrollableController dragController =
-      DraggableScrollableController();
-
   // Searching
   Map<String, dynamic> placeList = {};
   List<dynamic> descriptionList = [];
-
-  // Mosque Markers
-  List<Marker> markerList = [];
-  List<Map<String, dynamic>> markerListInfo = [];
-  bool markerListFlag = false;
 
   Future<MosqueListModel> getMosqueMarkers() async {
     try {
@@ -74,38 +56,6 @@ class MapRepository {
     } else {
       mapController.move(LatLng(myLat, myLong), 15.0);
     }
-  }
-
-  void onTapMarker(LatLng point) {
-    onTapMarkerPinList.clear();
-    onTapMarkerPin = Marker(
-      point: LatLng(point.latitude, point.longitude),
-      child: Transform.translate(
-        offset: const Offset(-5, -20),
-        child: const Icon(
-          size: 40,
-          Icons.location_on,
-          color: Color.fromARGB(255, 220, 64, 61),
-        ),
-      ),
-    );
-    onTapMarkerPinList.add(onTapMarkerPin);
-  }
-
-  void expandDraggableSheet() {
-    dragController.animateTo(
-      0.4,
-      duration: const Duration(milliseconds: 700),
-      curve: Curves.easeOutBack,
-    );
-  }
-
-  void collapseDraggableSheet() {
-    dragController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 700),
-      curve: Curves.easeOutBack,
-    );
   }
 
   Future<LatLng> pointToPlace(Map<String, dynamic> place) async {
@@ -174,7 +124,7 @@ class MapRepository {
 
     Map<String, dynamic> jsonData = jsonDecode(response);
 
-    descriptionList = [];
+    List<dynamic> descriptionList = [];
 
     if (jsonData.containsKey("predictions")) {
       List<dynamic> predictions = jsonData["predictions"];
@@ -187,6 +137,7 @@ class MapRepository {
           }
         }
       }
+
       return descriptionList;
     }
     return [];

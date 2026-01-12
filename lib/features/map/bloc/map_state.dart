@@ -32,3 +32,20 @@ class MapTapped extends MapLoaded {
   final List<Marker> pinList;
   MapTapped({required this.pinList, required super.mosques});
 }
+
+class MapSearchBarTapped extends MapLoaded {
+  MapSearchBarTapped({required super.mosques});
+}
+
+class MapUnfocusedSearchBar extends MapLoaded {
+  MapUnfocusedSearchBar({required super.mosques});
+}
+
+class MapSearchBarLoading extends MapSearchBarTapped {
+  MapSearchBarLoading({required super.mosques});
+}
+
+class MapSearchBarLoaded extends MapSearchBarTapped {
+  final List<dynamic> searchedResult;
+  MapSearchBarLoaded({required this.searchedResult, required super.mosques});
+}

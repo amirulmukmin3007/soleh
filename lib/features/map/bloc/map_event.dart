@@ -31,3 +31,10 @@ class MapClickSearchLocationEvent extends MapEvent {
 }
 
 class MapTapSearchBarEvent extends MapEvent {}
+
+class MapUnfocusSearchBarEvent extends MapEvent {}
+
+class MapInputSearchBarEvent extends MapEvent {
+  final String location;
+  MapInputSearchBarEvent({required this.location});
+}

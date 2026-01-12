@@ -11,7 +11,8 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:soleh/features/home/bloc/home_bloc.dart';
 import 'package:soleh/features/map/bloc/map_bloc.dart';
-import 'package:soleh/features/map/config/draggable_sheet.dart';
+import 'package:soleh/features/map/config/draggable_sheet_controller.dart';
+import 'package:soleh/features/map/config/map_controller.dart';
 import 'package:soleh/features/map/models/mosque.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/component/clustercircle.dart';
@@ -33,6 +34,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   late Formatter formatter;
   late DraggableSheetConfig draggableSheetConfig;
+  late MapConfig mapConfig;
   FocusNode focusNode = FocusNode();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController searchBarMapController = TextEditingController();
@@ -48,6 +50,7 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     formatter = Formatter();
     draggableSheetConfig = DraggableSheetConfig();
+    mapConfig = MapConfig();
   }
 
   @override
@@ -180,10 +183,9 @@ class _MapScreenState extends State<MapScreen> {
               distance: currentDistance,
               userLocation: currentLocation,
             ),
-            Visibility(
-              // visible: searchBarMapFlag,
-              visible: false,
-              child: Container(
+            if (state is MapSearchBarTapped &&
+                state is! MapUnfocusSearchBarEvent)
+              Container(
                 color: Colors.white,
                 width: double.infinity,
                 height: double.infinity,
@@ -232,32 +234,57 @@ class _MapScreenState extends State<MapScreen> {
                       ),
 
                       // Search Results Content
-                      // Expanded(
-                      //   child: FutureBuilder<List<dynamic>>(
-                      //     future: mapModel.placeAutoCompleteSearch(
-                      //         searchBarMapController.text),
-                      //     builder: (context, snapshot) {
-                      //       if (snapshot.connectionState ==
-                      //           ConnectionState.waiting) {
-                      //         return _buildLoadingState();
-                      //       } else if (snapshot.hasError) {
-                      //         return _buildErrorState();
-                      //       } else if (snapshot.hasData &&
-                      //           snapshot.data!.isEmpty) {
-                      //         return _buildEmptyState();
-                      //       } else if (snapshot.hasData) {
-                      //         return _buildSearchResults(snapshot.data!);
-                      //       } else {
-                      //         return _buildEmptyState();
-                      //       }
-                      //     },
-                      //   ),
-                      // ),
+                      if (state is MapSearchBarLoaded)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                                child: Text(
+                                  '${state.searchedResult.length} result${state.searchedResult.length == 1 ? '' : 's'} found',
+                                  style: TextStyle(
+                                    fontFamily: FontTheme().fontFamily,
+                                    fontSize: 14,
+                                    color: Colors.grey.shade600,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: ListView.separated(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                  itemCount: state.searchedResult.length,
+                                  separatorBuilder: (context, index) =>
+                                      const Divider(
+                                    height: 0.5,
+                                    thickness: 0.5,
+                                    color: Colors.grey,
+                                    indent: 48,
+                                  ),
+                                  itemBuilder: (context, index) {
+                                    return LocationListTile(
+                                      location: state.searchedResult[index],
+                                      press: (value) async {},
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (state is MapSearchBarLoading)
+                        Center(
+                          child: CircularProgressIndicator(
+                            color: ColorTheme.primary,
+                          ),
+                        )
                     ],
                   ),
                 ),
               ),
-            ),
             SafeArea(
               child: Column(
                 children: [
@@ -269,30 +296,23 @@ class _MapScreenState extends State<MapScreen> {
                       child: SearchBarMap(
                         focusNode: focusNode,
                         controller: searchBarMapController,
-                        // googleSearchListFlag: searchBarMapFlag,
-                        googleSearchListFlag: false,
-                        onTap: () {
-                          setState(() {
-                            // searchBarMapFlag = true;
-                          });
-                        },
-                        back: () {
-                          setState(() {
-                            // searchBarMapFlag = false;
-                            focusNode.unfocus();
-                          });
+                        googleSearchListFlag: state is MapSearchBarTapped,
+                        onTap: () =>
+                            context.read<MapBloc>().add(MapTapSearchBarEvent()),
+                        back: () => {
+                          focusNode.unfocus(),
+                          context
+                              .read<MapBloc>()
+                              .add(MapUnfocusSearchBarEvent())
                         },
                         onChanged: (value) {
-                          setState(() {
-                            // Autocomplete search
-                            // mapModel.placeAutoCompleteSearch(value);
-                          });
+                          context
+                              .read<MapBloc>()
+                              .add(MapInputSearchBarEvent(location: value));
                         },
                         onEditingComplete: () {
-                          setState(() {
-                            // searchBarMapFlag = false;
-                            focusNode.unfocus();
-                          });
+                          // searchBarMapFlag = false;
+                          focusNode.unfocus();
                         },
                         search: (value) async {
                           if (kDebugMode) {
@@ -337,8 +357,12 @@ class _MapScreenState extends State<MapScreen> {
                         shape: const CircleBorder(),
                         child: const Icon(FluentIcons.my_location_20_filled),
                         onTap: () {
-                          // _goToMyLocation();
-                          print(currentLocation);
+                          mapConfig.goToMyLocation(
+                            context,
+                            mapController,
+                            currentLocation.latitude,
+                            currentLocation.longitude,
+                          );
                         },
                       ),
                       SpeedDialChild(

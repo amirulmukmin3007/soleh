@@ -1,6 +1,4 @@
-import 'dart:developer';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -8,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:soleh/features/map/models/mosque.dart';
 import 'package:soleh/features/map/repositories/map_repository.dart';
-import 'package:soleh/shared/component/draggablebottomsheet.dart';
 
 part 'map_event.dart';
 part 'map_state.dart';
@@ -21,6 +18,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   List<Marker>? pinList = [];
   double? currentLat;
   double? currentLng;
+  bool isSearchBarActive = false;
 
   MapBloc({required this.repository}) : super(MapInitial()) {
     on<MapInitialEvent>(loadMap);
@@ -31,7 +29,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<MapTapEvent>(tapMap);
 
     // Searching
-    // on<MapTapSearchBarEvent>(tapSearchBar);
+    on<MapTapSearchBarEvent>(tapSearchBar);
+    on<MapUnfocusSearchBarEvent>(unfocusSearchBar);
+    on<MapInputSearchBarEvent>(inputSearchBar);
+    // on<MapSubmitSearchBarEvent>(submitSearchBar);
+    // on<MapClearSearchBarEvent>(clearSearchBar);
   }
 
   Future<void> loadMap(MapInitialEvent event, Emitter<MapState> emit) async {
@@ -95,12 +97,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     emit(MapTapped(pinList: pinList!, mosques: _cachedMosques!));
   }
 
-  // void tapSearchBar(
-  //     MapTapSearchBarEvent event, Emitter<MapState> emit) {
-  //   emit(MapSearchBarTapped(mosques: _cachedMosques!));
-  //   return Future.value();
-  // }
-
   String calculateDistance(lat1, lon1, lat2, lon2) {
     var p = 0.017453292519943295;
     var c = cos;
@@ -111,5 +107,24 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     distance = double.parse((distance).toStringAsFixed(2));
     String formattedDistance = NumberFormat.decimalPattern().format(distance);
     return formattedDistance;
+  }
+
+  void tapSearchBar(MapTapSearchBarEvent event, Emitter<MapState> emit) {
+    emit(MapSearchBarTapped(mosques: _cachedMosques!));
+  }
+
+  void unfocusSearchBar(
+      MapUnfocusSearchBarEvent event, Emitter<MapState> emit) {
+    emit(MapUnfocusedSearchBar(mosques: _cachedMosques!));
+  }
+
+  Future<void> inputSearchBar(
+      MapInputSearchBarEvent event, Emitter<MapState> emit) async {
+    emit(MapSearchBarLoading(mosques: _cachedMosques!));
+
+    List<dynamic> result =
+        await repository.placeAutoCompleteSearch(event.location);
+
+    emit(MapSearchBarLoaded(searchedResult: result, mosques: _cachedMosques!));
   }
 }
