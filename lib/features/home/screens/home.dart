@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_islamic_icons/flutter_islamic_icons.dart';
 import 'package:soleh/features/home/bloc/home_bloc.dart';
+import 'package:soleh/shared/bloc/prayer_countdown/prayer_countdown_cubit.dart';
 import 'package:soleh/shared/component/asmaulhusna_card.dart';
 import 'package:soleh/shared/component/home_header.dart';
 import 'package:soleh/shared/component/menu_box.dart';
@@ -26,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<Offset> _slideAnimation;
 
   Formatter formatter = Formatter();
+  DateTime? _lastRefreshDate;
 
   List<Map<String, dynamic>> menus = [
     {
@@ -76,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     ));
 
     context.read<HomeBloc>().add(HomeInitialEvent());
+    _lastRefreshDate = DateTime.now();
   }
 
   Widget _buildAnimatedCard({required Widget child, required int index}) {
@@ -94,10 +97,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _shimmerAzanCard() {
+  Widget _shimmerAzanArcCard() {
     return Container(
         padding: const EdgeInsets.all(20),
-        child: ShimmerBox(width: double.infinity, height: 200));
+        child: ShimmerBox(width: double.infinity, height: 300));
   }
 
   @override
@@ -121,7 +124,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   _fadeAnimationController.forward();
                 }
               });
-              return _displayScreen(context, state);
+              return RefreshIndicator(
+                  color: ColorTheme.primary,
+                  onRefresh: () async =>
+                      context.read<HomeBloc>().add(HomeInitialEvent()),
+                  child: _displayScreen(context, state));
             } else {
               return Container(
                 padding: const EdgeInsets.all(20),
@@ -138,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return SingleChildScrollView(
       child: Column(
         children: [
-          _shimmerAzanCard(),
+          _shimmerAzanArcCard(),
           Padding(
             padding: const EdgeInsets.only(left: 20.0, right: 20.0),
             child: Column(
@@ -174,87 +181,116 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _displayScreen(BuildContext context, HomeLoaded state) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).padding.top,
-            color: ColorTheme.primary,
-          ),
-          HomeHeader(
-            currentHijrahDate: state.hijrahDate.currentHijrahDate,
-            currentLocation: state.locationName,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-            child: Column(
-              children: [
-                Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    _buildAnimatedCard(
-                      index: 0,
-                      child: WaktuSolatCard(
-                        today: state.hijrahDate.currentDay,
-                        currentWaktuSolat: state.currentWaktuSolat,
-                        subuh: state.prayerTimes.subuh,
-                        syuruk: state.prayerTimes.syuruk,
-                        zohor: state.prayerTimes.zohor,
-                        asar: state.prayerTimes.asar,
-                        maghrib: state.prayerTimes.maghrib,
-                        isyak: state.prayerTimes.isyak,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildAnimatedCard(
-                      index: 1,
-                      child: Wrap(
-                        alignment: WrapAlignment.spaceEvenly,
-                        children: menus.map((item) {
-                          return Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: MenuBox2(
-                              icon: item['icon'],
-                              label: item['title'],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildAnimatedCard(
-                      index: 2,
-                      child: AsmaUlHusnaCard2(
-                        auhMeaning: state.asmaUlHusna.auhMeaning,
-                        auhAR: state.asmaUlHusna.auhAR,
-                        auhEN: state.asmaUlHusna.auhEN,
-                        auhNum: state.asmaUlHusna.auhNum,
-                        dayPicture: state.dayPicture,
-                        onRefresh: () {
-                          _fadeAnimationController.reset();
-                          context.read<HomeBloc>().add(HomeRefreshDataEvent());
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildAnimatedCard(
-                      index: 3,
-                      child: ZikirDailyCard(
-                        title: state.zikirHarian.title,
-                        imageUrl: state.zikirHarian.imageUrl,
-                        day: state.zikirHarian.day,
-                        dayName: state.zikirHarian.dayName,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
-                const SizedBox(height: 100)
-              ],
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final prayerTimes = {
+        'subuh': state.prayerTimes.subuh,
+        'syuruk': state.prayerTimes.syuruk,
+        'zohor': state.prayerTimes.zohor,
+        'asar': state.prayerTimes.asar,
+        'maghrib': state.prayerTimes.maghrib,
+        'isyak': state.prayerTimes.isyak,
+      };
+
+      context.read<PrayerCountdownCubit>().startCountdown(
+            currentPrayer: state.currentWaktuSolat,
+            prayerTimes: prayerTimes,
+          );
+    });
+
+    return BlocListener<PrayerCountdownCubit, PrayerCountdownState>(
+      listener: (context, countdownState) {
+        final now = DateTime.now();
+
+        if (_lastRefreshDate != null && now.day != _lastRefreshDate!.day) {
+          _lastRefreshDate = now;
+          _fadeAnimationController.reset();
+          context.read<HomeBloc>().add(HomeInitialEvent());
+        }
+      },
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).padding.top,
+              color: ColorTheme.primary,
             ),
-          )
-        ],
+            HomeHeader(
+              currentHijrahDate: state.hijrahDate.currentHijrahDate,
+              currentLocation: state.locationName,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+              child: Column(
+                children: [
+                  Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      _buildAnimatedCard(
+                        index: 0,
+                        child: WaktuSolatLineCard(
+                          today: state.hijrahDate.currentDay,
+                          currentWaktuSolat: state.currentWaktuSolat,
+                          subuh: state.prayerTimes.subuh,
+                          syuruk: state.prayerTimes.syuruk,
+                          zohor: state.prayerTimes.zohor,
+                          asar: state.prayerTimes.asar,
+                          maghrib: state.prayerTimes.maghrib,
+                          isyak: state.prayerTimes.isyak,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildAnimatedCard(
+                        index: 1,
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceEvenly,
+                          children: menus.map((item) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: MenuBox2(
+                                icon: item['icon'],
+                                label: item['title'],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildAnimatedCard(
+                        index: 2,
+                        child: AsmaUlHusnaCard2(
+                          auhMeaning: state.asmaUlHusna.auhMeaning,
+                          auhAR: state.asmaUlHusna.auhAR,
+                          auhEN: state.asmaUlHusna.auhEN,
+                          auhNum: state.asmaUlHusna.auhNum,
+                          dayPicture: state.dayPicture,
+                          onRefresh: () {
+                            _fadeAnimationController.reset();
+                            context
+                                .read<HomeBloc>()
+                                .add(HomeRefreshDataEvent());
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildAnimatedCard(
+                        index: 3,
+                        child: ZikirDailyCard(
+                          title: state.zikirHarian.title,
+                          imageUrl: state.zikirHarian.imageUrl,
+                          day: state.zikirHarian.day,
+                          dayName: state.zikirHarian.dayName,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                  const SizedBox(height: 100)
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

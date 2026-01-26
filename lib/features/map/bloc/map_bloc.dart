@@ -66,7 +66,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         _cachedMosques!.mosques.firstWhere((mosque) => mosque.refid == refId);
 
     String distance =
-        calculateDistance(currentLat, currentLng, mosque.lat, mosque.lng);
+        calculateDistance(currentLat!, currentLng!, mosque.lat, mosque.lng);
 
     emit(MapMarkerTapped(
       mosque: mosque,
@@ -97,7 +97,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     emit(MapTapped(pinList: pinList!, mosques: _cachedMosques!));
   }
 
-  String calculateDistance(lat1, lon1, lat2, lon2) {
+  String calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     var p = 0.017453292519943295;
     var c = cos;
     var a = 0.5 -

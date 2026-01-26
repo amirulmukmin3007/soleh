@@ -52,7 +52,6 @@ class HomeHeader extends StatelessWidget {
                           Text(
                             currentLocation,
                             style: TextStyle(
-                              fontFamily: GoogleFonts.montserrat().fontFamily,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -62,7 +61,6 @@ class HomeHeader extends StatelessWidget {
                       ),
                 Row(
                   children: [
-                    // Use TimeDisplay widget instead of state values
                     const TimeDisplay(),
                     const SizedBox(width: 20),
                     Container(
@@ -76,7 +74,6 @@ class HomeHeader extends StatelessWidget {
                         : Text(
                             currentHijrahDate,
                             style: TextStyle(
-                              fontFamily: GoogleFonts.montserrat().fontFamily,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -146,7 +143,6 @@ class _TimeDisplayState extends State<TimeDisplay> {
         Text(
           currentMeridiem,
           style: TextStyle(
-            fontFamily: GoogleFonts.montserrat().fontFamily,
             fontSize: 12,
             fontWeight: FontWeight.bold,
             color: Colors.white,

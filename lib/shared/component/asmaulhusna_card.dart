@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:soleh/shared/component/shimmer.dart';
 
 class AsmaUlHusnaCard2 extends StatelessWidget {
@@ -22,6 +21,31 @@ class AsmaUlHusnaCard2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String getOrdinalSuffix(int number) {
+      if (number < 0 || number > 99) {
+        return number.toString();
+      }
+
+      int lastDigit = number % 10;
+
+      int lastTwoDigits = number % 100;
+
+      if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+        return '${number}th';
+      }
+
+      switch (lastDigit) {
+        case 1:
+          return '${number}st';
+        case 2:
+          return '${number}nd';
+        case 3:
+          return '${number}rd';
+        default:
+          return '${number}th';
+      }
+    }
+
     return Material(
       elevation: 8.0,
       borderRadius: BorderRadius.circular(20),
@@ -43,7 +67,6 @@ class AsmaUlHusnaCard2 extends StatelessWidget {
                 : Text(
                     auhMeaning,
                     style: TextStyle(
-                      fontFamily: GoogleFonts.lato().fontFamily,
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -54,7 +77,6 @@ class AsmaUlHusnaCard2 extends StatelessWidget {
                 : Text(
                     '$auhAR - $auhEN',
                     style: TextStyle(
-                      fontFamily: GoogleFonts.montserrat().fontFamily,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.amber[400],
@@ -63,9 +85,8 @@ class AsmaUlHusnaCard2 extends StatelessWidget {
             trailing: auhAR == '' && auhEN == ''
                 ? const ShimmerLoad(height: 10, width: 60)
                 : Text(
-                    '${auhNum}th name',
+                    '${getOrdinalSuffix(int.parse(auhNum))} name',
                     style: TextStyle(
-                      fontFamily: GoogleFonts.montserrat().fontFamily,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

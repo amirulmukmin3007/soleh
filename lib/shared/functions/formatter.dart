@@ -46,48 +46,6 @@ class Formatter {
     return period;
   }
 
-  // String getCurrentWaktuSolat(
-  //     List<String> waktuSolatToday, List<String> waktuSolatList) {
-  //   print(waktuSolatToday);
-  //   DateTime currentTime = DateTime.now();
-
-  //   List<DateTime> times = waktuSolatToday.map((waktuSolat) {
-  //     List<String> parts = waktuSolat.split(':');
-  //     int hour = int.parse(parts[0]);
-  //     int minute = int.parse(parts[1]);
-  //     int second = int.parse(parts[2]);
-  //     return DateTime(
-  //       currentTime.year,
-  //       currentTime.month,
-  //       currentTime.day,
-  //       hour,
-  //       minute,
-  //       second,
-  //     );
-  //   }).toList();
-
-  //   List<DateTime> pastTimes =
-  //       times.where((time) => time.isBefore(currentTime)).toList();
-  //   print("Past Time " + pastTimes.toString());
-  //   print("Times " + times.toString());
-
-  //   DateTime nearestTime = times.reduce((a, b) {
-  //     Duration diffA = a.difference(currentTime).abs();
-  //     Duration diffB = b.difference(currentTime).abs();
-  //     return diffA < diffB ? a : b;
-  //   });
-
-  //   int nearestIndex = times.indexOf(nearestTime);
-
-  //   print("Nearest Index " + nearestIndex.toString());
-
-  //   String currentPrayerTime = waktuSolatList[nearestIndex];
-
-  //   print("Nearest Prayer " + currentPrayerTime);
-
-  //   return currentPrayerTime;
-  // }
-
   String getCurrentWaktuSolat(
       List<String> waktuSolatToday, List<String> waktuSolatList) {
     TimeOfDay currentTime = TimeOfDay.now();

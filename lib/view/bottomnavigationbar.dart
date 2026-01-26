@@ -17,11 +17,9 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
   int currentPageIndex = 0;
   List<bool> pageFlags = [true, false, false, false, false];
 
-  // Controllers for the animated indicators
   late final List<AnimationController> _controllers;
   late final List<Animation<double>> _animations;
 
-  // Navigation items data
   final List<NavItem> _navItems = [
     NavItem(
       icon: FluentIcons.home_24_regular,
@@ -69,7 +67,6 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
       );
     }).toList();
 
-    // Start animation for initial tab
     _controllers[0].value = 1.0;
   }
 
@@ -98,7 +95,7 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // Important for transparent bottom nav
+      extendBody: true,
       bottomNavigationBar: Container(
         height: 80,
         margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -127,7 +124,6 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
       body: IndexedStack(
         index: currentPageIndex,
         children: [
-          // Home(isActive: pageFlags[0]),
           HomeScreen(),
           Qibla(isActive: pageFlags[1]),
           MapScreen(isActive: pageFlags[2]),
@@ -159,7 +155,6 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
                   Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Animated indicator
                       AnimatedOpacity(
                         duration: const Duration(milliseconds: 200),
                         opacity: _animations[index].value,
@@ -172,8 +167,6 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-
-                      // Icon with animated size
                       Icon(
                         _animations[index].value > 0.5
                             ? navItem.activeIcon
@@ -187,10 +180,7 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 4),
-
-                  // Label with animated opacity
                   AnimatedOpacity(
                     duration: const Duration(milliseconds: 200),
                     opacity: _animations[index].value,
@@ -213,7 +203,6 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
   }
 }
 
-// Helper class for navigation items
 class NavItem {
   final IconData icon;
   final IconData activeIcon;
@@ -226,7 +215,6 @@ class NavItem {
   });
 }
 
-// Helper class for color interpolation
 class ColorLerp {
   static Color lerp(Color a, Color b, double t) {
     return Color.fromARGB(

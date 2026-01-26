@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:soleh/themes/colors.dart';
 
 class CircleButton extends StatelessWidget {
@@ -44,7 +43,6 @@ class CircleButton extends StatelessWidget {
           Text(
             waktuText,
             style: TextStyle(
-              fontFamily: GoogleFonts.montserrat().fontFamily,
               color: const Color.fromARGB(255, 110, 110, 110),
               fontWeight: FontWeight.bold,
               fontSize: 10,
@@ -54,7 +52,6 @@ class CircleButton extends StatelessWidget {
           Text(
             timeText,
             style: TextStyle(
-              fontFamily: GoogleFonts.montserrat().fontFamily,
               color: ColorTheme.primary,
               fontWeight: FontWeight.bold,
               fontSize: 10,

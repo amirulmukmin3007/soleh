@@ -1,4 +1,5 @@
 import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
@@ -6,9 +7,10 @@ import 'package:soleh/features/home/bloc/home_bloc.dart';
 import 'package:soleh/features/home/repositories/home_repository.dart';
 import 'package:soleh/features/map/bloc/map_bloc.dart';
 import 'package:soleh/features/map/repositories/map_repository.dart';
+import 'package:soleh/shared/bloc/prayer_countdown/prayer_countdown_cubit.dart';
 import 'package:soleh/splashscreen.dart';
-import 'package:soleh/themes/fonts.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:soleh/themes/theme_data.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -34,6 +36,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        // Cubit
+        BlocProvider(
+          create: (context) => PrayerCountdownCubit(),
+        ),
+        // Bloc
         BlocProvider(
           create: (context) => HomeBloc(repository: HomeRepository()),
         ),
@@ -41,14 +48,21 @@ class MyApp extends StatelessWidget {
           create: (context) => MapBloc(repository: MapRepository()),
         ),
       ],
-      child: MaterialApp(
-        locale: DevicePreview.locale(context),
-        builder: DevicePreview.appBuilder,
-        theme: ThemeData(fontFamily: FontTheme().fontFamily),
-        debugShowCheckedModeBanner: false,
-        title: 'Soleh App',
-        home: SplashScreen(),
-      ),
+      child: kDebugMode
+          ? MaterialApp(
+              locale: DevicePreview.locale(context),
+              builder: DevicePreview.appBuilder,
+              theme: AppTheme.theme,
+              debugShowCheckedModeBanner: true,
+              title: 'Soleh App Debug',
+              home: SplashScreen(),
+            )
+          : MaterialApp(
+              theme: AppTheme.theme,
+              debugShowCheckedModeBanner: false,
+              title: 'Soleh App',
+              home: SplashScreen(),
+            ),
     );
   }
 }

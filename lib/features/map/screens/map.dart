@@ -16,11 +16,11 @@ import 'package:soleh/features/map/config/map_controller.dart';
 import 'package:soleh/features/map/models/mosque.dart';
 import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/component/clustercircle.dart';
+import 'package:soleh/shared/component/dialogs.dart';
 import 'package:soleh/shared/component/draggablebottomsheet.dart';
 import 'package:soleh/shared/component/searchbar.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:soleh/themes/colors.dart';
-import 'package:soleh/themes/fonts.dart';
 
 class MapScreen extends StatefulWidget {
   static const routeName = '/map';
@@ -84,6 +84,7 @@ class _MapScreenState extends State<MapScreen> {
     return BlocListener<HomeBloc, HomeState>(
       listener: (context, state) {
         if (state is HomeLoaded) {
+          currentLocation = LatLng(state.userLatitude, state.userLongitude);
           context.read<MapBloc>().add(MapUpdateUserLocationEvent(
               lat: state.userLatitude, lng: state.userLongitude));
         }
@@ -145,7 +146,19 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 if (state is MapLoading)
-                  const Center(child: CircularProgressIndicator()),
+                  mainDialog(
+                    context,
+                    'Fetching data',
+                    Column(
+                      children: [
+                        Text('Populating Mosques...'),
+                        const CircularProgressIndicator(
+                          color: ColorTheme.primary,
+                        ),
+                      ],
+                    ),
+                    [],
+                  ),
                 if (state is MapLoaded)
                   MarkerClusterLayerWidget(
                     options: MarkerClusterLayerOptions(
@@ -222,7 +235,6 @@ class _MapScreenState extends State<MapScreen> {
                               child: Text(
                                 'Search Places',
                                 style: TextStyle(
-                                  fontFamily: FontTheme().fontFamily,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black87,
@@ -245,7 +257,6 @@ class _MapScreenState extends State<MapScreen> {
                                 child: Text(
                                   '${state.searchedResult.length} result${state.searchedResult.length == 1 ? '' : 's'} found',
                                   style: TextStyle(
-                                    fontFamily: FontTheme().fontFamily,
                                     fontSize: 14,
                                     color: Colors.grey.shade600,
                                     fontWeight: FontWeight.w500,
@@ -352,31 +363,24 @@ class _MapScreenState extends State<MapScreen> {
                         labelBackgroundColor: ColorTheme.primary,
                         labelStyle: TextStyle(
                           color: Colors.white,
-                          fontFamily: FontTheme().fontFamily,
                         ),
                         shape: const CircleBorder(),
                         child: const Icon(FluentIcons.my_location_20_filled),
-                        onTap: () {
-                          mapConfig.goToMyLocation(
+                        onTap: () => mapConfig.goToMyLocation(
                             context,
                             mapController,
                             currentLocation.latitude,
-                            currentLocation.longitude,
-                          );
-                        },
+                            currentLocation.longitude),
                       ),
                       SpeedDialChild(
                         label: 'Malaysia View',
                         labelBackgroundColor: ColorTheme.primary,
                         labelStyle: TextStyle(
                           color: Colors.white,
-                          fontFamily: FontTheme().fontFamily,
                         ),
                         shape: const CircleBorder(),
                         child: const Icon(FluentIcons.globe_20_filled),
-                        onTap: () {
-                          // _goToMalaysiaView();
-                        },
+                        onTap: () => mapConfig.malaysiaBirdView(mapController),
                       ),
                     ],
                   ),

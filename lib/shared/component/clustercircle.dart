@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:soleh/themes/colors.dart';
-import 'package:soleh/themes/fonts.dart';
 
 class ClusterCircle extends StatelessWidget {
   const ClusterCircle({super.key, required this.numericValue});
@@ -56,7 +55,6 @@ class ClusterCircle extends StatelessWidget {
             child: Text(
               formattedValue,
               style: TextStyle(
-                fontFamily: FontTheme().fontFamily,
                 fontWeight: FontWeight.w700,
                 fontSize: 13,
                 color: Colors.white,

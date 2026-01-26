@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:soleh/themes/colors.dart';
-import 'package:soleh/themes/fonts.dart';
 
 class InfoBar extends StatelessWidget {
   const InfoBar({
@@ -42,7 +41,6 @@ class InfoBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey.shade600,
-                    fontFamily: FontTheme().fontFamily,
                   ),
                 ),
                 Text(
@@ -50,7 +48,6 @@ class InfoBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    fontFamily: FontTheme().fontFamily,
                   ),
                 ),
               ],
@@ -87,8 +84,6 @@ class InfoBarClickableState extends State<InfoBarClickable> {
 
   @override
   Widget build(BuildContext context) {
-    final FontTheme fontTheme = FontTheme();
-
     return GestureDetector(
       onTapDown: (_) {
         setState(() {
@@ -158,7 +153,6 @@ class InfoBarClickableState extends State<InfoBarClickable> {
                     widget.textDisplay,
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: fontTheme.fontFamily,
                       fontWeight: FontWeight.w400,
                     ),
                     overflow: TextOverflow.ellipsis,

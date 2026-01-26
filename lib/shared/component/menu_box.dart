@@ -97,7 +97,7 @@ class _MenuBox2State extends State<MenuBox2>
                       const SizedBox(height: 4),
                       MarqueeText(
                         text: widget.label,
-                        maxWidth: 68, // 80 - 12
+                        maxWidth: 68,
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -292,7 +292,7 @@ class _MarqueeTextState extends State<MarqueeText>
       });
 
       if (_isOverflowing) {
-        final scrollDistance = _textWidth - _containerWidth + 25; // Add padding
+        final scrollDistance = _textWidth - _containerWidth + 25;
 
         _animation = Tween<double>(
           begin: 0,

@@ -21,6 +21,7 @@ class ShimmerLoad extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class ShimmerBox extends StatefulWidget {
   final double width;
   final double height;

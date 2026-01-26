@@ -1,7 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:soleh/themes/colors.dart';
-import 'package:soleh/themes/fonts.dart';
 
 class SearchBarMap extends StatelessWidget {
   const SearchBarMap({
@@ -27,7 +26,6 @@ class SearchBarMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FontTheme fontTheme = FontTheme();
     return Material(
       elevation: googleSearchListFlag ? 0 : 8,
       borderRadius: BorderRadius.circular(50),
@@ -46,7 +44,6 @@ class SearchBarMap extends StatelessWidget {
               floatingLabelBehavior: FloatingLabelBehavior.never,
               labelText: 'Search via Google Maps . . .',
               labelStyle: TextStyle(
-                fontFamily: fontTheme.fontFamily,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromARGB(255, 195, 195, 195),
@@ -86,7 +83,6 @@ class SearchBarMap extends StatelessWidget {
                     ),
             ),
             style: TextStyle(
-              fontFamily: fontTheme.fontFamily,
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: Colors.black,
@@ -111,8 +107,6 @@ class LocationListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FontTheme fontTheme = FontTheme();
-
     // Split location into main name and address
     final locationParts = _parseLocation(location);
 
@@ -149,7 +143,6 @@ class LocationListTile extends StatelessWidget {
                   Text(
                     locationParts['name']!,
                     style: TextStyle(
-                      fontFamily: fontTheme.fontFamily,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -165,7 +158,6 @@ class LocationListTile extends StatelessWidget {
                     Text(
                       locationParts['address']!,
                       style: TextStyle(
-                        fontFamily: fontTheme.fontFamily,
                         fontSize: 14,
                         color: Colors.grey.shade600,
                         height: 1.3,
@@ -225,7 +217,6 @@ class LocationListTileEnhanced extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FontTheme fontTheme = FontTheme();
     final locationParts = _parseLocation(location);
 
     return Material(
@@ -293,7 +284,6 @@ class LocationListTileEnhanced extends StatelessWidget {
                     Text(
                       locationParts['name']!,
                       style: TextStyle(
-                        fontFamily: fontTheme.fontFamily,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -309,7 +299,6 @@ class LocationListTileEnhanced extends StatelessWidget {
                       Text(
                         locationParts['address']!,
                         style: TextStyle(
-                          fontFamily: fontTheme.fontFamily,
                           fontSize: 13,
                           color: Colors.grey.shade600,
                           height: 1.3,
@@ -334,7 +323,6 @@ class LocationListTileEnhanced extends StatelessWidget {
                         child: Text(
                           distance!,
                           style: TextStyle(
-                            fontFamily: fontTheme.fontFamily,
                             fontSize: 11,
                             color: ColorTheme.primary,
                             fontWeight: FontWeight.w500,
@@ -401,7 +389,6 @@ class SearchBarMasjid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FontTheme fontTheme = FontTheme();
     return Material(
       // elevation: googleSearchListFlag ? 0 : 8,
       borderRadius: BorderRadius.circular(50),
@@ -419,7 +406,6 @@ class SearchBarMasjid extends StatelessWidget {
               floatingLabelBehavior: FloatingLabelBehavior.never,
               labelText: 'Search Masjid ...',
               labelStyle: TextStyle(
-                fontFamily: fontTheme.fontFamily,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromARGB(255, 195, 195, 195),
@@ -457,7 +443,6 @@ class SearchBarMasjid extends StatelessWidget {
                     ),
             ),
             style: TextStyle(
-              fontFamily: fontTheme.fontFamily,
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: Colors.black,
@@ -486,8 +471,6 @@ class MasjidListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FontTheme fontTheme = FontTheme();
-
     return Column(
       children: [
         ListTile(
@@ -511,7 +494,6 @@ class MasjidListTile extends StatelessWidget {
                 Text(
                   location,
                   style: TextStyle(
-                    fontFamily: fontTheme.fontFamily,
                     fontSize: 12,
                   ),
                   maxLines: 2,
@@ -522,7 +504,6 @@ class MasjidListTile extends StatelessWidget {
                   child: Text(
                     serviceType,
                     style: TextStyle(
-                      fontFamily: fontTheme.fontFamily,
                       fontSize: 10,
                       fontWeight: FontWeight.w300,
                       color: Colors.grey,
