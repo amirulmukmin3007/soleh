@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -50,7 +51,7 @@ class Formatter {
       List<String> waktuSolatToday, List<String> waktuSolatList) {
     TimeOfDay currentTime = TimeOfDay.now();
 
-    print('$waktuSolatToday $waktuSolatList');
+    if (kDebugMode) print('$waktuSolatToday $waktuSolatList');
 
     List<TimeOfDay> times = waktuSolatToday.map((waktuSolat) {
       List<String> parts = waktuSolat.split(':');

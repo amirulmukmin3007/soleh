@@ -38,3 +38,8 @@ class MapInputSearchBarEvent extends MapEvent {
   final String location;
   MapInputSearchBarEvent({required this.location});
 }
+
+class MapSearchResultTapEvent extends MapEvent {
+  final String place;
+  MapSearchResultTapEvent({required this.place});
+}

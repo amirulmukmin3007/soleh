@@ -23,7 +23,7 @@ Future<void> main() async {
 
   runApp(
     DevicePreview(
-      enabled: true,
+      enabled: kDebugMode ? true : false,
       builder: (context) => const MyApp(),
     ),
   );
@@ -48,21 +48,14 @@ class MyApp extends StatelessWidget {
           create: (context) => MapBloc(repository: MapRepository()),
         ),
       ],
-      child: kDebugMode
-          ? MaterialApp(
-              locale: DevicePreview.locale(context),
-              builder: DevicePreview.appBuilder,
-              theme: AppTheme.theme,
-              debugShowCheckedModeBanner: true,
-              title: 'Soleh App Debug',
-              home: SplashScreen(),
-            )
-          : MaterialApp(
-              theme: AppTheme.theme,
-              debugShowCheckedModeBanner: false,
-              title: 'Soleh App',
-              home: SplashScreen(),
-            ),
+      child: MaterialApp(
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,
+        theme: AppTheme.theme,
+        debugShowCheckedModeBanner: false,
+        title: 'Soleh App',
+        home: SplashScreen(),
+      ),
     );
   }
 }

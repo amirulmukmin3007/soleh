@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:soleh/themes/colors.dart';
 
@@ -57,7 +58,7 @@ class _MenuBox2State extends State<MenuBox2>
         _controller.reverse();
       },
       onTap: () {
-        print('${widget.label} tapped');
+        if (kDebugMode) print('${widget.label} tapped');
       },
       child: ScaleTransition(
         scale: _scaleAnimation,
@@ -183,7 +184,7 @@ class _MenuBoxState extends State<MenuBox> with SingleTickerProviderStateMixin {
         _controller.reverse();
       },
       onTap: () {
-        print('${widget.label} tapped');
+        if (kDebugMode) print('${widget.label} tapped');
       },
       child: ScaleTransition(
         scale: _scaleAnimation,

@@ -114,13 +114,13 @@ class _PulsingDotsBufferState extends State<PulsingDotsBuffer>
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF6366F1).withOpacity(scale),
-                      Color(0xFFA855F7).withOpacity(scale),
+                      Color(0xFF6366F1).withValues(alpha: scale),
+                      Color(0xFFA855F7).withValues(alpha: scale),
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xFF6366F1).withOpacity(0.5 * scale),
+                      color: Color(0xFF6366F1).withValues(alpha: 0.5 * scale),
                       blurRadius: 8,
                       spreadRadius: 2,
                     ),

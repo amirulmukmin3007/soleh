@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -32,12 +33,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<MapTapSearchBarEvent>(tapSearchBar);
     on<MapUnfocusSearchBarEvent>(unfocusSearchBar);
     on<MapInputSearchBarEvent>(inputSearchBar);
+    on<MapSearchResultTapEvent>(tapSearchResult);
     // on<MapSubmitSearchBarEvent>(submitSearchBar);
     // on<MapClearSearchBarEvent>(clearSearchBar);
   }
 
   Future<void> loadMap(MapInitialEvent event, Emitter<MapState> emit) async {
-    emit(MapLoading());
+    emit(MapLoading(
+      loadingTitle: 'Fetching data',
+      loadingMessage: 'Populating Mosques...',
+    ));
 
     if (_cachedMosques != null && _cachedMosques!.mosques.isNotEmpty) {
       emit(MapLoaded(mosques: _cachedMosques!));
@@ -49,7 +54,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       emit(MapLoaded(mosques: _cachedMosques!));
     } catch (e, stackTrace) {
-      print('Stack trace: $stackTrace');
+      if (kDebugMode) print('Stack trace: $stackTrace');
       emit(MapError(error: e.toString()));
     }
   }
@@ -126,5 +131,20 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         await repository.placeAutoCompleteSearch(event.location);
 
     emit(MapSearchBarLoaded(searchedResult: result, mosques: _cachedMosques!));
+  }
+
+  Future<void> tapSearchResult(
+      MapSearchResultTapEvent event, Emitter<MapState> emit) async {
+    emit(MapLoading(
+      loadingTitle: 'Locating place',
+      loadingMessage: 'Directing to ${event.place}',
+    ));
+
+    Map<String, dynamic> placeLatLng = await repository.getPlace(event.place);
+    emit(MapGoToPlace(
+      place: event.place,
+      placeLatLng: placeLatLng,
+      mosques: _cachedMosques!,
+    ));
   }
 }

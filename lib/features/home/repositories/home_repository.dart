@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:http/http.dart' as http;
 import 'package:soleh/features/home/models/asma_ul_husna.dart';
@@ -70,7 +71,7 @@ class HomeRepository {
         }
       }
     } catch (e) {
-      print('Error in getHijrahDate: $e');
+      if (kDebugMode) print('Error in getHijrahDate: $e');
     }
     return HijrahDateModel.setNull();
   }
@@ -97,7 +98,7 @@ class HomeRepository {
         }
       }
     } catch (e) {
-      print('Error in getLocationName: $e');
+      if (kDebugMode) print('Error in getLocationName: $e');
     }
     return '';
   }
@@ -140,7 +141,7 @@ class HomeRepository {
         }
       }
     } catch (e) {
-      print('Error in getPrayerTimes: $e');
+      if (kDebugMode) print('Error in getPrayerTimes: $e');
     }
     return PrayerTimesModel.setNull();
   }
@@ -165,7 +166,7 @@ class HomeRepository {
         return AsmaUlHusnaModel.fromJson(mappedData);
       }
     } catch (e) {
-      print('Error in getAsmaUlHusna: $e');
+      if (kDebugMode) print('Error in getAsmaUlHusna: $e');
     }
     return AsmaUlHusnaModel.setNull();
   }
@@ -185,7 +186,7 @@ class HomeRepository {
       );
 
       if (response.statusCode != 200) {
-        print('Failed to load page: ${response.statusCode}');
+        if (kDebugMode) print('Failed to load page: ${response.statusCode}');
         return ZikirHarianModel.setNull();
       }
 
@@ -229,7 +230,7 @@ class HomeRepository {
               }
             }
 
-            print('Image URL: $imageUrl');
+            if (kDebugMode) print('Image URL: $imageUrl');
 
             final mappedData = {
               'title': title,
@@ -241,13 +242,13 @@ class HomeRepository {
             return ZikirHarianModel.fromJson(mappedData);
           }
         } catch (e) {
-          print('Error parsing item: $e');
+          if (kDebugMode) print('Error parsing item: $e');
         }
       }
 
       return ZikirHarianModel.setNull();
     } catch (e) {
-      print('Error in getZikirDaily: $e');
+      if (kDebugMode) print('Error in getZikirDaily: $e');
       return ZikirHarianModel.setNull();
     }
   }
@@ -260,7 +261,7 @@ class HomeRepository {
         (zikir) => zikir['day'] == today,
       );
     } catch (e) {
-      print('No zikir found for today');
+      if (kDebugMode) print('No zikir found for today');
       return null;
     }
   }

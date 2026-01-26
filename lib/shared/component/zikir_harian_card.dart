@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ZikirDailyCard extends StatelessWidget {
@@ -79,7 +80,7 @@ class ZikirDailyCard extends StatelessWidget {
                   );
                 },
                 errorBuilder: (context, error, stackTrace) {
-                  print('Image load error: $error');
+                  if (kDebugMode) print('Image load error: $error');
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

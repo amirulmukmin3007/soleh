@@ -4,7 +4,12 @@ abstract class MapState {}
 
 class MapInitial extends MapState {}
 
-class MapLoading extends MapState {}
+class MapLoading extends MapState {
+  final String loadingTitle;
+  final String loadingMessage;
+
+  MapLoading({this.loadingTitle = 'Loading', this.loadingMessage = ''});
+}
 
 class MapLoaded extends MapState {
   final MosqueListModel mosques;
@@ -48,4 +53,11 @@ class MapSearchBarLoading extends MapSearchBarTapped {
 class MapSearchBarLoaded extends MapSearchBarTapped {
   final List<dynamic> searchedResult;
   MapSearchBarLoaded({required this.searchedResult, required super.mosques});
+}
+
+class MapGoToPlace extends MapLoaded {
+  final String place;
+  final Map<String, dynamic> placeLatLng;
+  MapGoToPlace(
+      {required this.place, required this.placeLatLng, required super.mosques});
 }

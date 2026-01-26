@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:soleh/features/home/models/asma_ul_husna.dart';
 import 'package:soleh/features/home/models/hijrah_date.dart';
 import 'package:soleh/features/home/models/prayer_times.dart';
@@ -108,7 +109,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         userLongitude: lng,
       ));
     } catch (e, stackTrace) {
-      print('Stack trace: $stackTrace');
+      if (kDebugMode) print('Stack trace: $stackTrace');
       emit(HomeError(message: 'Failed to load data: ${e.toString()}'));
     }
   }

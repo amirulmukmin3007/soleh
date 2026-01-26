@@ -9,15 +9,17 @@ class MapConfig {
   void goToMyLocation(BuildContext context, MapController mapController,
       double? myLat, double? myLong) {
     if (myLat == null || myLong == null) {
-      mainDialog(context, 'Location Unavailable',
-          Text('Please enable location service'), [
-        TextButton(
-          child: const Text('OK'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        )
-      ]);
+      CustomDialog(
+          title: 'Location Unavailable',
+          content: Text('Please enable location service'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ]);
     } else {
       mapController.move(LatLng(myLat, myLong), 15.0);
     }
@@ -25,5 +27,16 @@ class MapConfig {
 
   void malaysiaBirdView(MapController mapController) {
     mapController.move(LatLng(myLat, myLong), 5.2);
+  }
+
+  void goToPlace(BuildContext context, MapController mapController,
+      String place, double lat, double long) {
+    mapController.move(LatLng(lat, long), 15.0);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(place),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 }

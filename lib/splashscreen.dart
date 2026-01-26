@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:soleh/themes/colors.dart';
@@ -89,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
         permissionGranted = await location.requestPermission();
       }
     } catch (e) {
-      print('Error requesting location permission: $e');
+      if (kDebugMode) print('Error requesting location permission: $e');
     }
   }
 

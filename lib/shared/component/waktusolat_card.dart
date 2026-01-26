@@ -263,6 +263,7 @@ class _WaktuSolatLineCardState extends State<WaktuSolatLineCard>
                     },
                   ),
                 ),
+                const SizedBox(height: 30),
               ],
             ),
           ),
@@ -332,18 +333,18 @@ class _WaktuSolatLineCardState extends State<WaktuSolatLineCard>
             Text(
               'TIME UNTIL ${countdownState.nextPrayer.toUpperCase()}',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
-                fontSize: 10,
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 1.2,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 3),
             Text(
               countdownState.timeRemaining,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 32,
+                fontSize: 45,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
               ),
@@ -405,7 +406,7 @@ class _WaktuSolatLineCardState extends State<WaktuSolatLineCard>
         'backgroundColor': [
           const Color(0xFF209197),
           const Color(0xFF26AEB5),
-          const Color(0xFF3BECF6),
+          const Color(0xFF35D3DC),
         ],
       },
       'Asar': {
@@ -435,6 +436,246 @@ class _WaktuSolatLineCardState extends State<WaktuSolatLineCard>
     };
   }
 
+  List<dynamic> backgroundDeco = [
+    {
+      'name': 'Subuh',
+      'decoration': [
+        Positioned(
+          top: 50,
+          left: -20,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 70,
+          left: 80,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          left: 100,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          right: 20,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 80,
+          right: -10,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 30,
+          right: 100,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+      ]
+    },
+    {
+      'name': 'Zohor',
+      'decoration': [
+        Positioned(
+          top: 50,
+          left: -20,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 70,
+          left: 80,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          left: 100,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          right: 20,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 80,
+          right: -10,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 30,
+          right: 100,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+      ]
+    },
+    {
+      'name': 'Asar',
+      'decoration': [
+        Positioned(
+          top: 50,
+          left: -20,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 70,
+          left: 80,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          left: 100,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          right: 20,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 80,
+          right: -10,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 30,
+          right: 100,
+          child: Icon(
+            FluentIcons.cloud_16_filled,
+            size: 40,
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+      ]
+    },
+    {'name': 'Maghrib', 'decoration': []},
+    {
+      'name': 'Isyak',
+      'decoration': [
+        Positioned(
+          top: 50,
+          left: -20,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 70,
+          left: 80,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          left: 100,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          right: 20,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 80,
+          right: -10,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+        Positioned(
+          top: 30,
+          right: 100,
+          child: Icon(
+            FluentIcons.star_12_filled,
+            size: 40,
+            color: Colors.amber.withValues(alpha: 0.1),
+          ),
+        ),
+      ]
+    },
+  ];
+
   List<Color> _getCurrentBackgroundColors() {
     if (widget.currentWaktuSolat == 'Syuruk') {
       return [
@@ -460,7 +701,12 @@ class _WaktuSolatLineCardState extends State<WaktuSolatLineCard>
     if (widget.currentWaktuSolat == 'Syuruk') {
       return [];
     }
-    return [];
+
+    final decoration = backgroundDeco.firstWhere(
+      (deco) => deco['name'] == widget.currentWaktuSolat,
+      orElse: () => {'name': '', 'decoration': []},
+    );
+    return List<Widget>.from(decoration['decoration'] ?? []);
   }
 }
 
@@ -477,7 +723,7 @@ class PrayerLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final padding = 40.0;
+    final padding = 20.0;
     final lineY = size.height / 2;
     final lineWidth = size.width - (padding * 2);
     final spacing = lineWidth / (prayerTimes.length - 1);
@@ -589,7 +835,7 @@ class PrayerLinePainter extends CustomPainter {
           style: TextStyle(
             color: Colors.white,
             fontFamily: FontTheme().fontFamily,
-            fontSize: isActive ? 15.0 : 11.0,
+            fontSize: isActive ? 15.0 : 13.0,
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
           ),
         ),
@@ -612,8 +858,8 @@ class PrayerLinePainter extends CustomPainter {
             color:
                 isActive ? Colors.white : Colors.white.withValues(alpha: 0.6),
             fontFamily: FontTheme().fontFamily,
-            fontSize: isActive ? 13.0 : 10.0,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
+            fontSize: isActive ? 13.0 : 11.0,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.w800,
           ),
         ),
         textDirection: TextDirection.ltr,

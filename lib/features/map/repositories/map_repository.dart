@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -26,7 +27,7 @@ class MapRepository {
       final supabase = Supabase.instance.client;
 
       List<Map<String, dynamic>> data = await supabase.from('mosques').select();
-      print('Cluster markers count: ${data.length}');
+      if (kDebugMode) print('Cluster markers count: ${data.length}');
 
       List<MosqueModel> mosques = data.map((json) {
         return MosqueModel.fromJson(json);
@@ -34,7 +35,7 @@ class MapRepository {
 
       return MosqueListModel(mosques: mosques);
     } catch (e) {
-      print('Error fetching mosques: $e');
+      if (kDebugMode) print('Error fetching mosques: $e');
       return MosqueListModel(mosques: []);
     }
   }
@@ -42,15 +43,17 @@ class MapRepository {
   void goToMyLocation(BuildContext context, MapController mapController,
       double? myLat, double? myLong) {
     if (myLat == null || myLong == null) {
-      mainDialog(context, 'Location Unavailable',
-          Text('Please enable location service'), [
-        TextButton(
-          child: const Text('OK'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        )
-      ]);
+      CustomDialog(
+          title: 'Location Unavailable',
+          content: Text('Please enable location service'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ]);
     } else {
       mapController.move(LatLng(myLat, myLong), 15.0);
     }
@@ -73,10 +76,13 @@ class MapRepository {
 
     if (json.containsKey('result')) {
       var results = json['result'] as Map<String, dynamic>;
+      final placeLatLng =
+          results['geometry']['location'] as Map<String, dynamic>;
+
       if (kDebugMode) {
         // print(results);
       }
-      return results;
+      return placeLatLng;
     } else {
       if (kDebugMode) {
         // print('No results found');
@@ -118,7 +124,7 @@ class MapRepository {
 
     String? response = await fetchUrl(uri);
     placeList = jsonDecode(response!);
-    print(placeList);
+    if (kDebugMode) print(placeList);
 
     Map<String, dynamic> jsonData = jsonDecode(response);
 
@@ -155,7 +161,7 @@ class MapRepository {
     return null;
   }
 
-  String calculateDistance(lat1, lon1, lat2, lon2) {
+  String calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     var p = 0.017453292519943295;
     var c = cos;
     var a = 0.5 -

@@ -18,8 +18,8 @@ class ClusterCircle extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: RadialGradient(
           colors: [
-            ColorTheme.primary.withOpacity(0.2),
-            ColorTheme.primary.withOpacity(0.05),
+            ColorTheme.primary.withValues(alpha: 0.2),
+            ColorTheme.primary.withValues(alpha: 0.05),
           ],
           stops: const [0.6, 1.0],
         ),
@@ -35,17 +35,17 @@ class ClusterCircle extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [
                 ColorTheme.primary,
-                ColorTheme.primary.withOpacity(0.85),
+                ColorTheme.primary.withValues(alpha: 0.85),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: ColorTheme.primary.withOpacity(0.35),
+                color: ColorTheme.primary.withValues(alpha: 0.35),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 2),
               ),

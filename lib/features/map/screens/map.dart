@@ -97,6 +97,18 @@ class _MapScreenState extends State<MapScreen> {
           if (state is MapTapped) {
             draggableSheetConfig.collapseSheet(sheetController);
           }
+          if (state is MapGoToPlace) {
+            context.read<MapBloc>().add(MapTapEvent(
+                point: LatLng(
+                    state.placeLatLng['lat'], state.placeLatLng['lng'])));
+            mapConfig.goToPlace(
+              context,
+              mapController,
+              state.place,
+              state.placeLatLng['lat'],
+              state.placeLatLng['lng'],
+            );
+          }
         },
         builder: (BuildContext context, MapState state) {
           if (state is MapMarkerTapped) {
@@ -146,18 +158,17 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 if (state is MapLoading)
-                  mainDialog(
-                    context,
-                    'Fetching data',
-                    Column(
+                  CustomDialog(
+                    title: state.loadingTitle,
+                    content: Column(
                       children: [
-                        Text('Populating Mosques...'),
+                        Text(state.loadingMessage),
+                        const SizedBox(height: 10),
                         const CircularProgressIndicator(
                           color: ColorTheme.primary,
                         ),
                       ],
                     ),
-                    [],
                   ),
                 if (state is MapLoaded)
                   MarkerClusterLayerWidget(
@@ -278,7 +289,12 @@ class _MapScreenState extends State<MapScreen> {
                                   itemBuilder: (context, index) {
                                     return LocationListTile(
                                       location: state.searchedResult[index],
-                                      press: (value) async {},
+                                      press: (value) async => {
+                                        focusNode.unfocus(),
+                                        context.read<MapBloc>().add(
+                                            MapSearchResultTapEvent(
+                                                place: value)),
+                                      },
                                     );
                                   },
                                 ),
@@ -316,10 +332,10 @@ class _MapScreenState extends State<MapScreen> {
                               .read<MapBloc>()
                               .add(MapUnfocusSearchBarEvent())
                         },
-                        onChanged: (value) {
+                        onChanged: (value) => {
                           context
                               .read<MapBloc>()
-                              .add(MapInputSearchBarEvent(location: value));
+                              .add(MapInputSearchBarEvent(location: value)),
                         },
                         onEditingComplete: () {
                           // searchBarMapFlag = false;
