@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 part 'prayer_countdown_state.dart';
 
+// Optimized Cubit
 class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
   Timer? _timer;
 
@@ -22,24 +23,39 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
       isCountingDown: true,
     ));
 
+    String? lastEmittedTime;
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final remaining = _calculateTimeRemaining(nextPrayerInfo['time']!);
 
-      if (remaining == '00:00:00') {
-        final newNextPrayer =
-            _getNextPrayer(nextPrayerInfo['name']!, prayerTimes);
-        emit(state.copyWith(
-          timeRemaining: '00:00:00',
-          nextPrayer: newNextPrayer['name'],
-        ));
+      if (remaining != lastEmittedTime) {
+        lastEmittedTime = remaining;
 
-        startCountdown(
-            currentPrayer: nextPrayerInfo['name']!, prayerTimes: prayerTimes);
-      } else {
-        emit(state.copyWith(timeRemaining: remaining));
+        if (remaining == '00:00:00') {
+          // Prayer time reached! Find what comes after this prayer
+          final newNextPrayer =
+              _getNextPrayer(nextPrayerInfo['name']!, prayerTimes);
+
+          emit(state.copyWith(
+            timeRemaining: '00:00:00',
+            nextPrayer: newNextPrayer['name'],
+          ));
+
+          // FIXED: Restart countdown with the prayer that just arrived
+          // NOT the one that finished
+          startCountdown(
+            currentPrayer: newNextPrayer['name']!, // ← Use NEW prayer
+            prayerTimes: prayerTimes,
+          );
+        } else {
+          emit(state.copyWith(timeRemaining: remaining));
+        }
       }
     });
   }
+
+  // OPTIMIZATION 2: Cache parsed times to avoid re-parsing every second
+  final Map<String, DateTime> _parsedTimesCache = {};
 
   Map<String, String> _getNextPrayer(
       String currentPrayer, Map<String, String> prayerTimes) {
@@ -55,9 +71,11 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
 
     final now = DateTime.now();
 
+    // Find the next prayer that hasn't happened yet
     for (int i = 0; i < prayers.length; i++) {
       final prayerTime = _parseTime(times[i]);
 
+      // Check if this prayer time is still in the future
       if (prayerTime.isAfter(now)) {
         return {
           'name': prayers[i],
@@ -66,6 +84,7 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
       }
     }
 
+    // All prayers have passed for today, return tomorrow's Subuh
     return {
       'name': prayers[0],
       'time': times[0],
@@ -73,8 +92,14 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
   }
 
   DateTime _parseTime(String timeString) {
-    final now = DateTime.now();
+    // Use cache to avoid re-parsing the same time repeatedly
+    if (_parsedTimesCache.containsKey(timeString)) {
+      final cached = _parsedTimesCache[timeString]!;
+      final now = DateTime.now();
+      return DateTime(now.year, now.month, now.day, cached.hour, cached.minute);
+    }
 
+    final now = DateTime.now();
     String cleanTime = timeString.replaceAll(RegExp(r'[AP]M'), '').trim();
 
     final parts = cleanTime.split(':');
@@ -87,14 +112,16 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
       hour = 0;
     }
 
-    return DateTime(now.year, now.month, now.day, hour, minute);
+    final parsed = DateTime(now.year, now.month, now.day, hour, minute);
+    _parsedTimesCache[timeString] = parsed;
+
+    return parsed;
   }
 
   String _calculateTimeRemaining(String targetTimeString) {
     final now = DateTime.now();
     var targetTime = _parseTime(targetTimeString);
 
-    // If target time is before now, it's tomorrow
     if (targetTime.isBefore(now)) {
       targetTime = targetTime.add(const Duration(days: 1));
     }
@@ -120,6 +147,7 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
   @override
   Future<void> close() {
     _timer?.cancel();
+    _parsedTimesCache.clear();
     return super.close();
   }
 }
