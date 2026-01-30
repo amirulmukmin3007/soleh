@@ -32,7 +32,6 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
         lastEmittedTime = remaining;
 
         if (remaining == '00:00:00') {
-          // Prayer time reached! Find what comes after this prayer
           final newNextPrayer =
               _getNextPrayer(nextPrayerInfo['name']!, prayerTimes);
 
@@ -41,10 +40,8 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
             nextPrayer: newNextPrayer['name'],
           ));
 
-          // FIXED: Restart countdown with the prayer that just arrived
-          // NOT the one that finished
           startCountdown(
-            currentPrayer: newNextPrayer['name']!, // ← Use NEW prayer
+            currentPrayer: newNextPrayer['name']!,
             prayerTimes: prayerTimes,
           );
         } else {
@@ -54,7 +51,6 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
     });
   }
 
-  // OPTIMIZATION 2: Cache parsed times to avoid re-parsing every second
   final Map<String, DateTime> _parsedTimesCache = {};
 
   Map<String, String> _getNextPrayer(
@@ -71,11 +67,9 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
 
     final now = DateTime.now();
 
-    // Find the next prayer that hasn't happened yet
     for (int i = 0; i < prayers.length; i++) {
       final prayerTime = _parseTime(times[i]);
 
-      // Check if this prayer time is still in the future
       if (prayerTime.isAfter(now)) {
         return {
           'name': prayers[i],
@@ -84,7 +78,6 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
       }
     }
 
-    // All prayers have passed for today, return tomorrow's Subuh
     return {
       'name': prayers[0],
       'time': times[0],
@@ -92,7 +85,6 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
   }
 
   DateTime _parseTime(String timeString) {
-    // Use cache to avoid re-parsing the same time repeatedly
     if (_parsedTimesCache.containsKey(timeString)) {
       final cached = _parsedTimesCache[timeString]!;
       final now = DateTime.now();

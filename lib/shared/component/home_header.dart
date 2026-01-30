@@ -31,7 +31,14 @@ class HomeHeader extends StatelessWidget {
           borderRadius: BorderRadius.only(
             bottomRight: Radius.circular(100),
           ),
-          color: ColorTheme.primary,
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomRight,
+            colors: [
+              ColorTheme.primary,
+              Color(0xFF295E3D),
+            ],
+          ),
         ),
         child: Row(
           children: [

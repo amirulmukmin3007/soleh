@@ -25,9 +25,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app requires access to your location to provide personalized services.</string>
+	<string>We need access to your location to detect nearby Service Locations and provide relevant app features based on your current area.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app requires access to your location to provide personalized services.</string>
+	<string>We need access to your location to detect nearby Service Locations and provide relevant app features based on your current area.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need access to your location to detect nearby Service Locations and provide relevant app features based on your current area.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

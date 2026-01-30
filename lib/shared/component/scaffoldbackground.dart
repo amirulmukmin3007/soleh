@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:soleh/themes/colors.dart';
 // import 'package:flutter_islamic_icons/flutter_islamic_icons.dart';
 // import 'package:soleh/themes/colors.dart';
 
@@ -22,13 +23,13 @@ class ScaffoldBackground extends StatelessWidget {
         Container(
           height: double.infinity,
           width: double.infinity,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment(0.0, -1.0),
               end: Alignment(0.0, 1.0),
               colors: [
-                Color.fromARGB(255, 255, 255, 255),
-                Color.fromARGB(255, 184, 204, 186),
+                Color(0xFFFFFFFF),
+                Color(0xFFB8CCBA),
               ],
             ),
           ),

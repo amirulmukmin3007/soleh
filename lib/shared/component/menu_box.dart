@@ -192,7 +192,7 @@ class _MenuBoxState extends State<MenuBox> with SingleTickerProviderStateMixin {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: _isPressed

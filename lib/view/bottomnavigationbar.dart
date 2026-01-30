@@ -3,7 +3,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:soleh/features/home/screens/home.dart';
 import 'package:soleh/features/map/screens/map.dart';
 import 'package:soleh/themes/colors.dart';
-import 'package:soleh/view/qibla.dart';
+import 'package:soleh/features/qibla/screens/qibla.dart';
 import 'package:soleh/view/settings.dart';
 
 class AppNavBar extends StatefulWidget {
@@ -96,28 +96,30 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      bottomNavigationBar: Container(
-        height: 80,
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 15,
-              offset: const Offset(0, 4),
-              spreadRadius: 1,
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          height: 80,
+          margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 15,
+                offset: const Offset(0, 4),
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(_navItems.length, (index) {
+                return _buildNavItem(index);
+              }),
             ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(_navItems.length, (index) {
-              return _buildNavItem(index);
-            }),
           ),
         ),
       ),
@@ -125,7 +127,7 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
         index: currentPageIndex,
         children: [
           HomeScreen(),
-          Qibla(isActive: pageFlags[1]),
+          QiblaScreen(isActive: pageFlags[1]),
           MapScreen(isActive: pageFlags[2]),
           Placeholder(),
           Settings(isActive: pageFlags[4]),

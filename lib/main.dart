@@ -7,7 +7,8 @@ import 'package:soleh/features/home/bloc/home_bloc.dart';
 import 'package:soleh/features/home/repositories/home_repository.dart';
 import 'package:soleh/features/map/bloc/map_bloc.dart';
 import 'package:soleh/features/map/repositories/map_repository.dart';
-import 'package:soleh/shared/bloc/prayer_countdown/prayer_countdown_cubit.dart';
+import 'package:soleh/features/prayer_countdown/cubit/prayer_countdown_cubit.dart';
+import 'package:soleh/features/qibla/cubit/qibla_direction_cubit.dart';
 import 'package:soleh/splashscreen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:soleh/themes/theme_data.dart';
@@ -23,7 +24,7 @@ Future<void> main() async {
 
   runApp(
     DevicePreview(
-      enabled: kDebugMode ? true : false,
+      enabled: kDebugMode ? false : false,
       builder: (context) => const MyApp(),
     ),
   );
@@ -39,6 +40,9 @@ class MyApp extends StatelessWidget {
         // Cubit
         BlocProvider(
           create: (context) => PrayerCountdownCubit(),
+        ),
+        BlocProvider(
+          create: (context) => QiblaDirectionCubit(),
         ),
         // Bloc
         BlocProvider(
