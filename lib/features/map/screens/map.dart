@@ -21,6 +21,7 @@ import 'package:soleh/shared/component/draggablebottomsheet.dart';
 import 'package:soleh/shared/component/searchbar.dart';
 import 'package:soleh/shared/functions/formatter.dart';
 import 'package:soleh/themes/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MapScreen extends StatefulWidget {
   static const routeName = '/map';
@@ -148,8 +149,20 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 TileLayer(
                   urlTemplate:
-                      "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&key=$googleMapKey",
-                  userAgentPackageName: 'com.example.app',
+                      'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+                  subdomains: const ['a', 'b', 'c'],
+                  userAgentPackageName: 'com.soleh.app',
+                ),
+                RichAttributionWidget(
+                  popupInitialDisplayDuration: const Duration(seconds: 3),
+                  attributions: [
+                    TextSourceAttribution(
+                      'OpenStreetMap contributors',
+                      onTap: () => launchUrl(
+                        Uri.parse('https://openstreetmap.org/copyright'),
+                      ),
+                    ),
+                  ],
                 ),
                 CurrentLocationLayer(
                   style: const LocationMarkerStyle(

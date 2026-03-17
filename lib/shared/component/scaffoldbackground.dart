@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:soleh/themes/colors.dart';
 // import 'package:flutter_islamic_icons/flutter_islamic_icons.dart';
 // import 'package:soleh/themes/colors.dart';
 

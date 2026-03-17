@@ -4,6 +4,7 @@ import 'package:soleh/features/home/screens/home.dart';
 import 'package:soleh/features/map/screens/map.dart';
 import 'package:soleh/themes/colors.dart';
 import 'package:soleh/features/qibla/screens/qibla.dart';
+import 'package:soleh/features/calendar/screens/calendar.dart';
 import 'package:soleh/view/settings.dart';
 
 class AppNavBar extends StatefulWidget {
@@ -129,7 +130,7 @@ class _AppNavBarState extends State<AppNavBar> with TickerProviderStateMixin {
           HomeScreen(),
           QiblaScreen(isActive: pageFlags[1]),
           MapScreen(isActive: pageFlags[2]),
-          Placeholder(),
+          CalendarPage(),
           Settings(isActive: pageFlags[4]),
         ],
       ),

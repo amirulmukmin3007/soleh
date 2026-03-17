@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -33,9 +34,12 @@ class MapRepository {
       }).toList();
 
       return MosqueListModel(mosques: mosques);
+    } on SocketException {
+      if (kDebugMode) print('No internet connection');
+      throw Exception('No internet connection. Please check your network.');
     } catch (e) {
       if (kDebugMode) print('Error fetching mosques: $e');
-      return MosqueListModel(mosques: []);
+      throw Exception('Something went wrong. Please try again.');
     }
   }
 
@@ -119,6 +123,7 @@ class MapRepository {
     Uri uri = Uri.https(googleMapsUrl, googlePlaceAutoCompleteApi, {
       "input": input,
       "key": placeKey,
+      "components": "country:my",
     });
 
     String? response = await fetchUrl(uri);

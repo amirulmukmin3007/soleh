@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
+import 'package:soleh/features/calendar/bloc/calendar_bloc.dart';
+import 'package:soleh/features/calendar/repositories/calendar_repository.dart';
 import 'package:soleh/features/home/bloc/home_bloc.dart';
 import 'package:soleh/features/home/repositories/home_repository.dart';
 import 'package:soleh/features/map/bloc/map_bloc.dart';
@@ -50,6 +52,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => MapBloc(repository: MapRepository()),
+        ),
+        BlocProvider(
+          create: (context) => CalendarBloc(repository: CalendarRepository()),
         ),
       ],
       child: MaterialApp(
