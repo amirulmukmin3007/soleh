@@ -22,18 +22,10 @@ class DraggableSheetConfig {
   void openNavigationURL(String app, String latFrom, String longFrom,
       String latTo, String longTo) async {
     if (app == 'waze') {
-      String url = wazeNavigate +
-          wazeToLL +
-          latTo +
-          wazeToMiddle +
-          longTo +
-          wazeFromLL +
-          latFrom +
-          wazeToMiddle +
-          longFrom;
+      String url = '$wazeNavigateDomain$latTo,$longTo&navigate=yes';
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } else if (app == 'googlemaps') {
-      String url = "$googlemapsNavigate$latFrom,$longFrom/$latTo,$longTo";
+      String url = "$googlemapsNavigateDomain$latFrom,$longFrom/$latTo,$longTo";
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     }
   }

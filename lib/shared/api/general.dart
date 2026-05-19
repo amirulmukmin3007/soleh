@@ -7,8 +7,10 @@ String wazeToLL = "to=ll.";
 String wazeToMiddle = "%2C";
 String wazeFromLL = "from=ll.";
 
-String googlemapsNavigate = "https://www.google.com/maps/dir/";
+String googlemapsNavigateDomain = "https://www.google.com/maps/dir/";
 String googlemapsShareLocation = "https://maps.google.com/?q=";
+
+String wazeNavigateDomain = "https://waze.com/ul?ll=";
 
 String mpt = 'https://mpt.i906.my/api/prayer/';
 

@@ -62,11 +62,8 @@ class Formatter {
 
     for (int i = 0; i < times.length; i++) {
       TimeOfDay start = times[i];
-      TimeOfDay end = (i + 1 < times.length)
-          ? times[i + 1]
-          : times[0]; // Wrap around to the first time
+      TimeOfDay end = (i + 1 < times.length) ? times[i + 1] : times[0];
 
-      // Check if the current time is between the start and end times
       if (currentTime.hour > start.hour ||
           (currentTime.hour == start.hour &&
               currentTime.minute >= start.minute)) {

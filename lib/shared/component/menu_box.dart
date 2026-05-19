@@ -6,12 +6,14 @@ class MenuBox2 extends StatefulWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final String route;
 
   const MenuBox2({
     super.key,
     required this.icon,
     required this.label,
     this.color = const Color(0xFF4A7C59),
+    required this.route,
   });
 
   @override
@@ -58,7 +60,8 @@ class _MenuBox2State extends State<MenuBox2>
         _controller.reverse();
       },
       onTap: () {
-        if (kDebugMode) print('${widget.label} tapped');
+        print('${widget.route} tapped');
+        Navigator.pushNamed(context, widget.route);
       },
       child: ScaleTransition(
         scale: _scaleAnimation,

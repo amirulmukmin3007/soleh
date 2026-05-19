@@ -14,7 +14,6 @@ import 'package:soleh/features/map/bloc/map_bloc.dart';
 import 'package:soleh/features/map/config/draggable_sheet_controller.dart';
 import 'package:soleh/features/map/config/map_controller.dart';
 import 'package:soleh/features/map/models/mosque.dart';
-import 'package:soleh/shared/api/googlemaps.dart';
 import 'package:soleh/shared/component/clustercircle.dart';
 import 'package:soleh/shared/component/dialogs.dart';
 import 'package:soleh/shared/component/draggablebottomsheet.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soleh/themes/colors.dart';
 
+// ignore: must_be_immutable
 class CalendarAppBar extends StatefulWidget implements PreferredSizeWidget {
   CalendarAppBar({super.key, required this.isYearView});
 

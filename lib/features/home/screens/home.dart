@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     {
       'icon': FlutterIslamicIcons.solidTasbihHand,
       'title': 'Tasbih',
-      'route': '/menu',
+      'route': '/tasbih',
     },
     {
       'icon': FlutterIslamicIcons.calendar,
@@ -250,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               child: MenuBox2(
                                 icon: item['icon'],
                                 label: item['title'],
+                                route: item['route'],
                               ),
                             );
                           }).toList(),
