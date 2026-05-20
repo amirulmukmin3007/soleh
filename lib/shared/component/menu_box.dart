@@ -60,7 +60,7 @@ class _MenuBox2State extends State<MenuBox2>
         _controller.reverse();
       },
       onTap: () {
-        print('${widget.route} tapped');
+        if (kDebugMode) print('${widget.route} tapped');
         Navigator.pushNamed(context, widget.route);
       },
       child: ScaleTransition(

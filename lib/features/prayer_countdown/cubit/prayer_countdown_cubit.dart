@@ -92,6 +92,7 @@ class PrayerCountdownCubit extends Cubit<PrayerCountdownState> {
     }
 
     final now = DateTime.now();
+    // ignore: deprecated_member_use
     String cleanTime = timeString.replaceAll(RegExp(r'[AP]M'), '').trim();
 
     final parts = cleanTime.split(':');

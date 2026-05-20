@@ -200,8 +200,10 @@ class _MapScreenState extends State<MapScreen> {
                         onMarkerTap: (marker) {
                           String trimKey =
                               (marker.key as ValueKey<String>).value;
-                          String finalKey =
-                              trimKey.replaceAll(RegExp(r"[<>'\[\]]"), '');
+                          String finalKey = trimKey.replaceAll(
+                              // ignore: deprecated_member_use
+                              RegExp(r"[<>'\[\]]") as Pattern,
+                              '');
                           context.read<MapBloc>().add(
                                 MapTapMarkerEvent(refId: finalKey),
                               );

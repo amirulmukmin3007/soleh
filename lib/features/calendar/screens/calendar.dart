@@ -88,7 +88,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withValues(alpha: 0.1),
                           spreadRadius: 1,
                           blurRadius: 5,
                           offset: const Offset(0, 2),
@@ -130,7 +130,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       calendarStyle: CalendarStyle(
                         // Today's date styling
                         todayDecoration: BoxDecoration(
-                          color: ColorTheme.primary.withOpacity(0.5),
+                          color: ColorTheme.primary.withValues(alpha: 0.5),
                           shape: BoxShape.circle,
                         ),
                         todayTextStyle: const TextStyle(
@@ -157,7 +157,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
                         // Weekend styling
                         weekendTextStyle: TextStyle(
-                          color: ColorTheme.primary.withOpacity(0.7),
+                          color: ColorTheme.primary.withValues(alpha: 0.7),
                         ),
 
                         // Outside month days
@@ -171,10 +171,10 @@ class _CalendarPageState extends State<CalendarPage> {
                         titleCentered: true,
                         formatButtonShowsNext: false,
                         formatButtonDecoration: BoxDecoration(
-                          color: ColorTheme.primary.withOpacity(0.1),
+                          color: ColorTheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: ColorTheme.primary.withOpacity(0.3),
+                            color: ColorTheme.primary.withValues(alpha: 0.3),
                           ),
                         ),
                         formatButtonTextStyle: TextStyle(
@@ -200,7 +200,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                         weekendStyle: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: ColorTheme.primary.withOpacity(0.7),
+                          color: ColorTheme.primary.withValues(alpha: 0.7),
                         ),
                       ),
                     ),
@@ -243,7 +243,7 @@ class _CalendarPageState extends State<CalendarPage> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -354,7 +354,7 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 3,
             ),
@@ -380,7 +380,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: ColorTheme.primary.withOpacity(0.1),
+                  color: ColorTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

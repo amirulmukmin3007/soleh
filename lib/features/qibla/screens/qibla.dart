@@ -277,8 +277,12 @@ class _QiblaScreenState extends State<QiblaScreen> {
 
         double qiblaAngle = _qiblaDirection! - heading;
 
-        while (qiblaAngle > 180) qiblaAngle -= 360;
-        while (qiblaAngle < -180) qiblaAngle += 360;
+        while (qiblaAngle > 180) {
+          qiblaAngle -= 360;
+        }
+        while (qiblaAngle < -180) {
+          qiblaAngle += 360;
+        }
 
         bool isCurrentlyAligned = qiblaAngle.abs() <= alignmentThreshold;
 
@@ -343,43 +347,41 @@ class _QiblaScreenState extends State<QiblaScreen> {
               // Rotating arrow
               Transform.rotate(
                 angle: (qiblaAngle * (math.pi / 180)),
-                child: Container(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Arrow pointing up
-                      Icon(
-                        Icons.navigation,
-                        size: 100,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Arrow pointing up
+                    Icon(
+                      Icons.navigation,
+                      size: 100,
+                      color: Color(0xFFFFD700),
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    // "Qibla" text under arrow
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
                         color: Color(0xFFFFD700),
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            blurRadius: 10,
-                          ),
-                        ],
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      SizedBox(height: 8),
-                      // "Qibla" text under arrow
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFFD700),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'QIBLA',
-                          style: TextStyle(
-                            color: Color(0xFF1a472a),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
-                          ),
+                      child: Text(
+                        'QIBLA',
+                        style: TextStyle(
+                          color: Color(0xFF1a472a),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -476,7 +478,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
         Vibration.vibrate(duration: 200);
       }
     } catch (e) {
-      print('Vibration error: $e');
+      if (kDebugMode) print('Vibration error: $e');
     }
   }
 }

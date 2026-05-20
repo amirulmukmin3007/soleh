@@ -221,10 +221,14 @@ class NavItem {
 class ColorLerp {
   static Color lerp(Color a, Color b, double t) {
     return Color.fromARGB(
-      lerpInt(a.alpha, b.alpha, t),
-      lerpInt(a.red, b.red, t),
-      lerpInt(a.green, b.green, t),
-      lerpInt(a.blue, b.blue, t),
+      lerpInt((a.a * 255.0).round().clamp(0, 255),
+          (b.a * 255.0).round().clamp(0, 255), t),
+      lerpInt((a.r * 255.0).round().clamp(0, 255),
+          (b.r * 255.0).round().clamp(0, 255), t),
+      lerpInt((a.g * 255.0).round().clamp(0, 255),
+          (b.g * 255.0).round().clamp(0, 255), t),
+      lerpInt((a.b * 255.0).round().clamp(0, 255),
+          (b.b * 255.0).round().clamp(0, 255), t),
     );
   }
 
