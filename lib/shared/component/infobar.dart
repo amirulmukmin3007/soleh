@@ -105,6 +105,7 @@ class InfoBarClickableState extends State<InfoBarClickable> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),
+        // ignore: deprecated_member_use
         transform: Matrix4.identity()..scale(_isTapped ? 0.95 : 1.0),
         decoration: BoxDecoration(
           gradient: LinearGradient(
